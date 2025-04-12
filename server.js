@@ -8,17 +8,8 @@ const dotenv = require('dotenv');
 // Load environment variables
 dotenv.config();
 
-// Import routes
-const authRoutes = require('./routes/authRoutes');
-
-// Import database connection
-const connectDB = require('./config/database');
-
 // Create Express app
 const app = express();
-
-// Connect to database
-connectDB();
 
 // Middleware
 app.use(express.json());
@@ -27,34 +18,27 @@ app.use(cookieParser());
 app.use(cors());
 
 // Serve static files
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname)));
 
-// API routes
-app.use('/api/auth', authRoutes);
-
-// Frontend Routes
+// Simple route for testing
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'login.html'));
+// Simple API route for testing
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working!' });
 });
 
-app.get('/register', (req, res) => {
-  res.sendFile(path.join(__dirname, 'register.html'));
-});
+// Connect to MongoDB - commented out until we fix the authentication system
+// mongoose.connect(process.env.MONGODB_URI, {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true
+// })
+// .then(() => console.log('MongoDB connected'))
+// .catch(err => console.log('MongoDB connection error:', err));
 
-app.get('/verify-email/:token', (req, res) => {
-  // This route will be handled by the API
-  res.redirect(`/api/auth/verify-email/${req.params.token}`);
-});
-
-app.get('/reset-password/:token', (req, res) => {
-  res.sendFile(path.join(__dirname, 'reset-password.html'));
-});
-
-// 404 handler - must be after all other routes
+// 404 handler
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, '404.html'));
 });
