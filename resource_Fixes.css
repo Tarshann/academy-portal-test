@@ -1,0 +1,71 @@
+/* Additional styles to fix resource loading errors */
+
+/* Default image placeholders */
+img[src*="logo"], .logo {
+  background-color: #002244;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-family: 'Arial', sans-serif;
+  min-height: 80px;
+  min-width: 150px;
+}
+
+img[alt="Basketball Training"] {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  display: block;
+  min-height: 200px;
+  min-width: 100%;
+  margin: 15px 0;
+}
+
+/* Fix for missing Font Awesome icons */
+[class*="fa-"] {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  margin-right: 0.25em;
+  border-radius: 2px;
+}
+
+/* Fix for any other missing resources */
+.social-icons a {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  background-color: #002244;
+  color: white;
+  text-align: center;
+  line-height: 30px;
+  border-radius: 50%;
+  margin: 0 5px;
+}
+
+/* Ensure all links have proper styling */
+a {
+  color: #002244;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+/* Ensure proper spacing for content */
+section {
+  margin: 30px 0;
+  padding: 0 15px;
+}
+
+/* Responsive fixes */
+@media (max-width: 768px) {
+  img, .logo {
+    max-width: 100%;
+  }
+}
