@@ -1,47 +1,30 @@
-// Extremely simple server.js file
+// Updated server.js file to serve the enhanced portal
 const express = require('express');
+const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Simple route that returns a message
+// Serve static files from the root directory
+app.use(express.static(__dirname));
+
+// Basic API endpoint for testing
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working!' });
+});
+
+// Route for the home page
 app.get('/', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>The Academy Portal</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-          margin: 0;
-          background-color: #f5f5f5;
-        }
-        .container {
-          text-align: center;
-          padding: 20px;
-          background-color: white;
-          border-radius: 8px;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-          max-width: 500px;
-        }
-        h1 {
-          color: #002244;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <h1>The Academy Portal</h1>
-        <p>Hello World! The server is running successfully.</p>
-        <p>This is a minimal test page to verify deployment.</p>
-      </div>
-    </body>
-    </html>
-  `);
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Route for the login page
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+// Error handling for 404 - page not found
+app.use((req, res) => {
+  res.status(404).send('Page not found. Please check the URL and try again.');
 });
 
 // Start the server
