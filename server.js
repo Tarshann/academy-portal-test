@@ -30,8 +30,8 @@ const io = socketIo(server, {
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
-  socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+  serverSelectionTimeoutMS: 10000, // Increase timeout
+  socketTimeoutMS: 45000
 })
 .then(() => console.log('MongoDB connected successfully'))
 .catch(err => {
@@ -39,8 +39,11 @@ mongoose.connect(process.env.MONGODB_URI, {
     message: err.message,
     name: err.name,
     code: err.code,
-    connectionString: process.env.MONGODB_URI.replace(/:(.*?)@/, ':****@') // Mask password
+    connectionString: process.env.MONGODB_URI.replace(/:(.*?)@/, ':****@'), // Mask password
+    fullError: err
   });
+  // Log additional connection details
+  console.log('Attempted Connection String:', process.env.MONGODB_URI.replace(/:(.*?)@/, ':****@'));
   process.exit(1);
 });
 
