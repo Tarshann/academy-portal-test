@@ -61,26 +61,51 @@ app.use((req, res, next) => {
 });
 
 // Define Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/admin', require('./routes/admin'));
-app.use('/api/profile', require('./routes/profile'));
-app.use('/api/conversations', require('./routes/conversation'));
-app.use('/api/conversations', require('./routes/message'));
-app.use((err, req, res, next) => {
-  console.error('Unhandled Error:', {
+// Define Routes with Error Handling
+try {
+  app.use('/api/auth', require('./routes/auth'));
+} catch (err) {
+  console.error('Error importing auth routes:', {
     message: err.message,
-    name: err.name,
-    stack: err.stack,
-    path: req.path,
-    method: req.method
+    stack: err.stack
   });
-  res.status(500).json({
-    error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'production' 
-      ? 'An unexpected error occurred' 
-      : err.message
+}
+
+try {
+  app.use('/api/admin', require('./routes/admin'));
+} catch (err) {
+  console.error('Error importing admin routes:', {
+    message: err.message,
+    stack: err.stack
   });
-});
+}
+
+try {
+  app.use('/api/profile', require('./routes/profile'));
+} catch (err) {
+  console.error('Error importing profile routes:', {
+    message: err.message,
+    stack: err.stack
+  });
+}
+
+try {
+  app.use('/api/conversations', require('./routes/conversation'));
+} catch (err) {
+  console.error('Error importing conversation routes:', {
+    message: err.message,
+    stack: err.stack
+  });
+}
+
+try {
+  app.use('/api/conversations', require('./routes/message'));
+} catch (err) {
+  console.error('Error importing message routes:', {
+    message: err.message,
+    stack: err.stack
+  });
+}
 
 // Serve React app in production
 if (process.env.NODE_ENV === 'production') {
