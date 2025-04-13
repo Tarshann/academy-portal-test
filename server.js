@@ -136,6 +136,11 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
+  console.error('Uncaught Exception:', {
+    message: error.message,
+    name: error.name,
+    stack: error.stack
+  });
+  // Optional: Graceful shutdown
+  process.exit(1);
 });
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
