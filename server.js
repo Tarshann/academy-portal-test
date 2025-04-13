@@ -1,58 +1,129 @@
+// server.js
 const express = require('express');
 const mongoose = require('mongoose');
-const path = require('path');
 const cors = require('cors');
-const cookieParser = require('cookie-parser');
+const path = require('path');
+const helmet = require('helmet');
+const morgan = require('morgan');
 const dotenv = require('dotenv');
+const http = require('http');
+const socketIo = require('socket.io');
 
 // Load environment variables
 dotenv.config();
 
-// Create Express app
+// Initialize Express app
 const app = express();
 
+// Create HTTP server with Express app
+const server = http.createServer(app);
+
+// Initialize Socket.IO
+const io = socketIo(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+  }
+});
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  });
+
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(express.json({ extended: false }));
 app.use(cors());
+app.use(helmet({
+  contentSecurityPolicy: false // Disable CSP for development, enable in production
+}));
+app.use(morgan('dev')); // Logging
 
-// Serve static files
-app.use(express.static(path.join(__dirname)));
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Simple route for testing
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Define Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/admin', require('./routes/admin'));
+app.use('/api/profile', require('./routes/profile'));
+app.use('/api/conversations', require('./routes/conversation'));
+app.use('/api/conversations', require('./routes/message'));
+
+// Serve React app in production
+if (process.env.NODE_ENV === 'production') {
+  // Set static folder
+  app.use(express.static('client/build'));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+}
+
+// Socket.IO Connection Handling
+io.on('connection', socket => {
+  console.log('New client connected');
+  
+  // Authenticate socket connection
+  socket.on('authenticate', async (token) => {
+    try {
+      // Here we would verify the JWT token
+      // For now, we'll just log it
+      console.log('Socket authenticated:', token);
+      
+      // Store user ID in socket object for later use
+      socket.userId = 'user_id_from_token';
+    } catch (err) {
+      console.error('Socket authentication error:', err);
+    }
+  });
+  
+  // Join conversation room
+  socket.on('join_conversation', (conversationId) => {
+    socket.join(`conversation:${conversationId}`);
+    console.log(`Socket joined conversation: ${conversationId}`);
+  });
+  
+  // Leave conversation room
+  socket.on('leave_conversation', (conversationId) => {
+    socket.leave(`conversation:${conversationId}`);
+    console.log(`Socket left conversation: ${conversationId}`);
+  });
+  
+  // User typing indicator
+  socket.on('typing', (data) => {
+    const { conversationId } = data;
+    socket.to(`conversation:${conversationId}`).emit('typing', {
+      conversationId,
+      userId: socket.userId
+    });
+  });
+  
+  // User stopped typing indicator
+  socket.on('stop_typing', (data) => {
+    const { conversationId } = data;
+    socket.to(`conversation:${conversationId}`).emit('stop_typing', {
+      conversationId,
+      userId: socket.userId
+    });
+  });
+  
+  // Handle disconnect
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
 });
 
-// Simple API route for testing
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'API is working!' });
-});
+// Export socket.io instance for use in routes
+module.exports.io = io;
 
-// Connect to MongoDB - commented out until we fix the authentication system
-// mongoose.connect(process.env.MONGODB_URI, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true
-// })
-// .then(() => console.log('MongoDB connected'))
-// .catch(err => console.log('MongoDB connection error:', err));
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).sendFile(path.join(__dirname, '404.html'));
-});
-
-// Error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
-});
+// Set port for the server
+const PORT = process.env.PORT || 5000;
 
 // Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-module.exports = app;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
