@@ -1,254 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Academy Basketball Program - Communication Portal</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="resource_fixes.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Academy Portal</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link href="/css/styles.css" rel="stylesheet">
 </head>
 <body>
-    <header class="main-header">
-        <div class="container">
-            <div class="logo-container">
-                <img src="academy_logo.svg" alt="The Academy Logo" class="logo">
-            </div>
-            <nav class="main-nav">
-                <button class="menu-toggle" aria-label="Toggle menu">
-                    <span class="hamburger"></span>
-                </button>
-                <ul class="nav-links">
-                    <li><a href="index.html" class="active">Home</a></li>
-                    <li><a href="#">Programs</a></li>
-                    <li><a href="#">Schedule</a></li>
-                    <li><a href="#">Teams</a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Contact</a></li>
-                    <li><a href="login.html" class="btn btn-primary">Login</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <img src="/images/logo.svg" alt="The Academy Logo" class="logo">
+        <h1>The Academy Portal</h1>
+        <button class="menu-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      <nav class="desktop-menu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/programs">Programs</a></li>
+          <li><a href="/messages">Messages</a></li>
+          <li><a href="/profile">Profile</a></li>
+        </ul>
+      </nav>
+      <nav class="mobile-menu hidden">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/programs">Programs</a></li>
+          <li><a href="/messages">Messages</a></li>
+          <li><a href="/profile">Profile</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
 
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>Welcome to The Academy's Communication Portal</h1>
-                <p>Connect with coaches, teammates, and parents. Access schedules, chat with your team, and stay updated with the latest announcements.</p>
-                <div class="hero-buttons">
-                    <a href="login.html" class="btn btn-primary">Sign In</a>
-                    <a href="register.html" class="btn btn-secondary">Create Account</a>
-                </div>
-            </div>
-            <div class="hero-image">
-                <img src="basketball_training.jpg" alt="Basketball Training">
-            </div>
-        </div>
+  <main class="container">
+    <section class="auth-section">
+      <div class="card">
+        <h2>Login</h2>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+        <p>Don't have an account? <a href="#" class="toggle" data-target="register-form">Register</a></p>
+      </div>
+
+      <div class="card hidden" id="register-form">
+        <h2>Register</h2>
+        <form>
+          <div class="form-group">
+            <label for="reg-name">Full Name</label>
+            <input type="text" id="reg-name" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="reg-email">Email</label>
+            <input type="email" id="reg-email" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="reg-phone">Phone Number</label>
+            <input type="tel" id="reg-phone" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="reg-password">Password</label>
+            <input type="password" id="reg-password" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="reg-confirm">Confirm Password</label>
+            <input type="password" id="reg-confirm" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+        <p>Already have an account? <a href="#" class="toggle" data-target="login-form">Login</a></p>
+      </div>
     </section>
+  </main>
 
-    <section class="announcements">
-        <div class="container">
-            <h2 class="section-title">Latest Announcements</h2>
-            <div class="announcement-slider">
-                <div class="announcement-slide active">
-                    <div class="announcement-card">
-                        <div class="announcement-date">
-                            <span class="month">APR</span>
-                            <span class="day">12</span>
-                        </div>
-                        <div class="announcement-content">
-                            <h3>Spring League Registration Now Open</h3>
-                            <p>Registration for the spring league is now open for all age groups. Sign up before April 20th to secure your spot!</p>
-                            <a href="#" class="read-more">Read More</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="announcement-slide">
-                    <div class="announcement-card">
-                        <div class="announcement-date">
-                            <span class="month">APR</span>
-                            <span class="day">10</span>
-                        </div>
-                        <div class="announcement-content">
-                            <h3>New Skills Training Sessions Added</h3>
-                            <p>We've added new skills training sessions on Wednesday evenings. These sessions will focus on shooting and ball handling.</p>
-                            <a href="#" class="read-more">Read More</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="announcement-slide">
-                    <div class="announcement-card">
-                        <div class="announcement-date">
-                            <span class="month">APR</span>
-                            <span class="day">05</span>
-                        </div>
-                        <div class="announcement-content">
-                            <h3>Summer Camp Early Bird Registration</h3>
-                            <p>Early bird registration for our summer camps is now open. Save 15% when you register before May 1st.</p>
-                            <a href="#" class="read-more">Read More</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="slider-controls">
-                    <button class="prev-slide" aria-label="Previous announcement"><i class="fas fa-chevron-left"></i></button>
-                    <div class="slider-dots">
-                        <button class="slider-dot active" data-slide="0" aria-label="Go to announcement 1"></button>
-                        <button class="slider-dot" data-slide="1" aria-label="Go to announcement 2"></button>
-                        <button class="slider-dot" data-slide="2" aria-label="Go to announcement 3"></button>
-                    </div>
-                    <button class="next-slide" aria-label="Next announcement"><i class="fas fa-chevron-right"></i></button>
-                </div>
-            </div>
-        </div>
-    </section>
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 The Academy. All rights reserved.</p>
+    </div>
+  </footer>
 
-    <section class="features">
-        <div class="container">
-            <h2 class="section-title">Communication Portal Features</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3>Team Chat</h3>
-                    <p>Connect with your team through group chats organized by program and team.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-comment-dots"></i>
-                    </div>
-                    <h3>Private Messaging</h3>
-                    <p>Send direct messages to coaches, teammates, or parents.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-calendar-alt"></i>
-                    </div>
-                    <h3>Schedules & Events</h3>
-                    <p>Access practice schedules, game times, and special events.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <h3>File Sharing</h3>
-                    <p>Share and access important documents, forms, and resources.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="programs">
-        <div class="container">
-            <h2 class="section-title">Our Programs</h2>
-            <div class="programs-grid">
-                <div class="program-card">
-                    <div class="program-image">
-                        <img src="skills_training.jpg" alt="Skills Training">
-                    </div>
-                    <div class="program-content">
-                        <h3>Skills Training</h3>
-                        <p>Group and individual training sessions focused on building fundamental basketball skills.</p>
-                        <a href="#" class="btn btn-outline">Learn More</a>
-                    </div>
-                </div>
-                <div class="program-card">
-                    <div class="program-image">
-                        <img src="shooting_sessions.jpg" alt="Shooting Sessions">
-                    </div>
-                    <div class="program-content">
-                        <h3>Shooting Sessions</h3>
-                        <p>Specialized shooting sessions held on Tuesdays and Thursdays to improve shooting technique.</p>
-                        <a href="#" class="btn btn-outline">Learn More</a>
-                    </div>
-                </div>
-                <div class="program-card">
-                    <div class="program-image">
-                        <img src="travel_teams.jpg" alt="Travel Teams">
-                    </div>
-                    <div class="program-content">
-                        <h3>Travel Teams</h3>
-                        <p>Competitive travel teams for 4th and 5th grade boys and girls.</p>
-                        <a href="#" class="btn btn-outline">Learn More</a>
-                    </div>
-                </div>
-                <div class="program-card">
-                    <div class="program-image">
-                        <img src="seasonal_leagues.jpg" alt="Seasonal Leagues">
-                    </div>
-                    <div class="program-content">
-                        <h3>Seasonal Leagues</h3>
-                        <p>Basketball leagues with age divisions for 3rd/4th, 5th, and 6th/7th grades.</p>
-                        <a href="#" class="btn btn-outline">Learn More</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="cta">
-        <div class="container">
-            <div class="cta-content">
-                <h2>Ready to Join The Academy Community?</h2>
-                <p>Create an account to access our communication portal and stay connected with The Academy basketball program.</p>
-                <a href="register.html" class="btn btn-primary">Get Started</a>
-            </div>
-        </div>
-    </section>
-
-    <footer class="main-footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <img src="academy_logo.svg" alt="The Academy Logo" class="logo">
-                    <div class="footer-about">
-                        <h3>THE ACADEMY</h3>
-                        <p>Building fundamental basketball skills for young athletes and raising the overall talent level in the region.</p>
-                    </div>
-                </div>
-                <div class="footer-links">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="#">Programs</a></li>
-                        <li><a href="#">Schedule</a></li>
-                        <li><a href="#">Teams</a></li>
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-contact">
-                    <h4>Contact Us</h4>
-                    <ul>
-                        <li><i class="fas fa-map-marker-alt"></i> Gallatin, Tennessee</li>
-                        <li><i class="fas fa-envelope"></i> <a href="mailto:info@academytn.com">info@academytn.com</a></li>
-                        <li><i class="fas fa-phone"></i> <a href="tel:+15551234567">(555) 123-4567</a></li>
-                    </ul>
-                </div>
-                <div class="footer-social">
-                    <h4>Follow Us</h4>
-                    <div class="social-icons">
-                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; <span id="current-year">2025</span> The Academy Basketball Program. All rights reserved.</p>
-                <ul class="footer-bottom-links">
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                </ul>
-            </div>
-        </div>
-    </footer>
-
-    <script src="script.js"></script>
+  <script src="/js/main.js"></script>
 </body>
 </html>
