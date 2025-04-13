@@ -55,12 +55,32 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+app.use((req, res, next) => {
+  console.log(`Incoming ${req.method} request to ${req.path}`);
+  next();
+});
+
 // Define Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/profile', require('./routes/profile'));
 app.use('/api/conversations', require('./routes/conversation'));
 app.use('/api/conversations', require('./routes/message'));
+app.use((err, req, res, next) => {
+  console.error('Unhandled Error:', {
+    message: err.message,
+    name: err.name,
+    stack: err.stack,
+    path: req.path,
+    method: req.method
+  });
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'production' 
+      ? 'An unexpected error occurred' 
+      : err.message
+  });
+});
 
 // Serve React app in production
 if (process.env.NODE_ENV === 'production') {
