@@ -36,7 +36,8 @@ mongoose.connect(process.env.MONGODB_URI, {
   console.error('MongoDB Connection Error:', {
     message: err.message,
     name: err.name,
-    code: err.code
+    code: err.code,
+    connectionString: process.env.MONGODB_URI // This will help diagnose connection issues
   });
   process.exit(1);
 });
