@@ -26,163 +26,100 @@ const io = socketIo(server, {
   }
 });
 
-// Connect to MongoDB
+// Connect to MongoDB with more robust error handling
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+  socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
 })
 .then(() => console.log('MongoDB connected successfully'))
 .catch(err => {
-  console.error('MongoDB Connection Error:', {
+  console.error('Detailed MongoDB Connection Error:', {
     message: err.message,
     name: err.name,
     code: err.code,
-    connectionString: process.env.MONGODB_URI // This will help diagnose connection issues
+    connectionString: process.env.MONGODB_URI.replace(/:(.*?)@/, ':****@') // Mask password
   });
   process.exit(1);
 });
 
 // Middleware
 app.use(express.json({ extended: false }));
-app.use(cors());
-app.use(helmet({
-  contentSecurityPolicy: false // Disable CSP for development, enable in production
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*', // More secure CORS
+  credentials: true
 }));
-app.use(morgan('dev')); // Logging
+app.use(helmet({
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? true : false
+}));
+app.use(morgan('combined')); // More detailed logging
 
-// Serve static files from the 'public' directory
+// Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Request logging middleware
 app.use((req, res, next) => {
-  console.log(`Incoming ${req.method} request to ${req.path}`);
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
 });
 
-// Define Routes
-// Define Routes with Error Handling
-try {
-  app.use('/api/auth', require('./routes/auth'));
-} catch (err) {
-  console.error('Error importing auth routes:', {
-    message: err.message,
-    stack: err.stack
-  });
-}
+// Routes with comprehensive error handling
+const routeConfig = [
+  { path: '/api/auth', file: './routes/auth' },
+  { path: '/api/admin', file: './routes/admin' },
+  { path: '/api/profile', file: './routes/profile' },
+  { path: '/api/conversations', file: './routes/conversation' },
+  { path: '/api/conversations', file: './routes/message' }
+];
 
-try {
-  app.use('/api/admin', require('./routes/admin'));
-} catch (err) {
-  console.error('Error importing admin routes:', {
-    message: err.message,
-    stack: err.stack
-  });
-}
+routeConfig.forEach(route => {
+  try {
+    app.use(route.path, require(route.file));
+    console.log(`Route ${route.path} loaded successfully`);
+  } catch (err) {
+    console.error(`Error loading route ${route.path}:`, {
+      message: err.message,
+      stack: err.stack
+    });
+  }
+});
 
-try {
-  app.use('/api/profile', require('./routes/profile'));
-} catch (err) {
-  console.error('Error importing profile routes:', {
+// Centralized error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Unhandled Error:', {
     message: err.message,
-    stack: err.stack
+    stack: err.stack,
+    path: req.path,
+    method: req.method
   });
-}
-
-try {
-  app.use('/api/conversations', require('./routes/conversation'));
-} catch (err) {
-  console.error('Error importing conversation routes:', {
-    message: err.message,
-    stack: err.stack
+  
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'production' 
+      ? 'An unexpected error occurred' 
+      : err.message
   });
-}
-
-try {
-  app.use('/api/conversations', require('./routes/message'));
-} catch (err) {
-  console.error('Error importing message routes:', {
-    message: err.message,
-    stack: err.stack
-  });
-}
+});
 
 // Serve React app in production
 if (process.env.NODE_ENV === 'production') {
-  // Set static folder
   app.use(express.static('client/build'));
-
   app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
   });
 }
 
-// Socket.IO Connection Handling
-io.on('connection', socket => {
-  console.log('New client connected');
-  
-  // Authenticate socket connection
-  socket.on('authenticate', async (token) => {
-    try {
-      // Here we would verify the JWT token
-      // For now, we'll just log it
-      console.log('Socket authenticated:', token);
-      
-      // Store user ID in socket object for later use
-      socket.userId = 'user_id_from_token';
-    } catch (err) {
-      console.error('Socket authentication error:', err);
-    }
-  });
-  
-  // Join conversation room
-  socket.on('join_conversation', (conversationId) => {
-    socket.join(`conversation:${conversationId}`);
-    console.log(`Socket joined conversation: ${conversationId}`);
-  });
-  
-  // Leave conversation room
-  socket.on('leave_conversation', (conversationId) => {
-    socket.leave(`conversation:${conversationId}`);
-    console.log(`Socket left conversation: ${conversationId}`);
-  });
-  
-  // User typing indicator
-  socket.on('typing', (data) => {
-    const { conversationId } = data;
-    socket.to(`conversation:${conversationId}`).emit('typing', {
-      conversationId,
-      userId: socket.userId
-    });
-  });
-  
-  // User stopped typing indicator
-  socket.on('stop_typing', (data) => {
-    const { conversationId } = data;
-    socket.to(`conversation:${conversationId}`).emit('stop_typing', {
-      conversationId,
-      userId: socket.userId
-    });
-  });
-  
-  // Handle disconnect
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  });
-});
-
-// Export socket.io instance for use in routes
-module.exports.io = io;
-
-// Set port for the server
+// Set port and start server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
 });
-// Start server
+
+// Global error handlers
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  console.error('Unhandled Rejection:', reason);
 });
 
 process.on('uncaughtException', (error) => {
@@ -191,6 +128,7 @@ process.on('uncaughtException', (error) => {
     name: error.name,
     stack: error.stack
   });
-  // Optional: Graceful shutdown
   process.exit(1);
 });
+
+module.exports = { app, server, io };
