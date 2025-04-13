@@ -1,0 +1,5 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="100" r="95" fill="#0C2340" />
+  <path d="M100 30 L150 140 L50 140 Z" fill="none" stroke="white" stroke-width="10" />
+  <text x="100" y="170" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="14" fill="white">THE ACADEMY</text>
+</svg>
