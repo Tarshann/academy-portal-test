@@ -521,3 +521,109 @@ router.post('/:conversationId/messages/:messageId/reaction', [
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
+  }
+});
+
+// @route   DELETE api/conversations/:conversationId/messages/:messageId/reaction
+// @desc    Remove a reaction from a message
+// @access  Private
+router.delete('/:conversationId/messages/:messageId/reaction', auth, async (req, res) => {
+  try {
+    // Validate MongoDB ObjectIds
+    if (!mongoose.Types.ObjectId.isValid(req.params.conversationId) ||
+        !mongoose.Types.ObjectId.isValid(req.params.messageId)) {
+      return res.status(400).json({ msg: 'Invalid ID' });
+    }
+    
+    const message = await Message.findById(req.params.messageId);
+    
+    if (!message) {
+      return res.status(404).json({ msg: 'Message not found' });
+    }
+    
+    // Verify message belongs to the specified conversation
+    if (message.conversation.toString() !== req.params.conversationId) {
+      return res.status(400).json({ msg: 'Message not found in this conversation' });
+    }
+    
+    // Check if user is a participant in the conversation
+    const conversation = await Conversation.findById(req.params.conversationId);
+    const isParticipant = conversation.participants.some(
+      p => p.user.toString() === req.user.id && p.isActive
+    );
+    
+    if (!isParticipant) {
+      return res.status(403).json({ msg: 'Not authorized to access this conversation' });
+    }
+    
+    // Remove user's reaction
+    const reactionIndex = message.reactions.findIndex(
+      r => r.user.toString() === req.user.id
+    );
+    
+    if (reactionIndex !== -1) {
+      message.reactions.splice(reactionIndex, 1);
+      message.updatedAt = Date.now();
+      
+      await message.save();
+    }
+    
+    // Populate message data before returning
+    const populatedMessage = await Message.findById(message._id)
+      .populate('sender', 'name email profileImage')
+      .populate('readBy', 'name email')
+      .populate('reactions.user', 'name profileImage');
+    
+    res.json(populatedMessage);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// @route   POST api/conversations/:conversationId/messages/:messageId/read
+// @desc    Mark a message as read
+// @access  Private
+router.post('/:conversationId/messages/:messageId/read', auth, async (req, res) => {
+  try {
+    // Validate MongoDB ObjectIds
+    if (!mongoose.Types.ObjectId.isValid(req.params.conversationId) ||
+        !mongoose.Types.ObjectId.isValid(req.params.messageId)) {
+      return res.status(400).json({ msg: 'Invalid ID' });
+    }
+    
+    const message = await Message.findById(req.params.messageId);
+    
+    if (!message) {
+      return res.status(404).json({ msg: 'Message not found' });
+    }
+    
+    // Verify message belongs to the specified conversation
+    if (message.conversation.toString() !== req.params.conversationId) {
+      return res.status(400).json({ msg: 'Message not found in this conversation' });
+    }
+    
+    // Check if user is a participant in the conversation
+    const conversation = await Conversation.findById(req.params.conversationId);
+    const isParticipant = conversation.participants.some(
+      p => p.user.toString() === req.user.id && p.isActive
+    );
+    
+    if (!isParticipant) {
+      return res.status(403).json({ msg: 'Not authorized to access this conversation' });
+    }
+    
+    // Check if message is already read by user
+    if (!message.readBy.includes(req.user.id)) {
+      message.readBy.push(req.user.id);
+      await message.save();
+    }
+    
+    res.json({ msg: 'Message marked as read' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+module.exports = router;
