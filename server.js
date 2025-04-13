@@ -29,13 +29,15 @@ const io = socketIo(server, {
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-  useFindAndModify: false
+  useUnifiedTopology: true
 })
 .then(() => console.log('MongoDB connected successfully'))
 .catch(err => {
-  console.error('MongoDB connection error:', err);
+  console.error('MongoDB Connection Error:', {
+    message: err.message,
+    name: err.name,
+    code: err.code
+  });
   process.exit(1);
 });
 
