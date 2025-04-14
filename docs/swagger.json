@@ -1,21 +1,65 @@
-const fs = require('fs');
-const path = require('path');
-
-const docsDir = path.join(__dirname, 'docs');
-if (!fs.existsSync(docsDir)) {
-  fs.mkdirSync(docsDir);
-}
-
-const swaggerJson = {
+{
   "swagger": "2.0",
   "info": {
     "title": "Academy Portal API",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "description": "API documentation for The Academy Portal"
   },
-  "paths": {}
-};
-
-fs.writeFileSync(
-  path.join(docsDir, 'swagger.json'),
-  JSON.stringify(swaggerJson, null, 2)
-);
+  "basePath": "/api",
+  "schemes": ["http", "https"],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "tags": ["Authentication"],
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "description": "User registration data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": {"type": "string"},
+                "lastName": {"type": "string"},
+                "email": {"type": "string"},
+                "password": {"type": "string"},
+                "phoneNumber": {"type": "string"}
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {"description": "Registration successful"},
+          "400": {"description": "Invalid input"}
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "User login",
+        "tags": ["Authentication"],
+        "parameters": [
+          {
+            "name": "credentials",
+            "in": "body",
+            "description": "Login credentials",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {"type": "string"},
+                "password": {"type": "string"}
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {"description": "Login successful"},
+          "400": {"description": "Invalid credentials"}
+        }
+      }
+    }
+  }
+}
