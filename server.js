@@ -1,4 +1,5 @@
 // server.js
+require('dotenv').config();
 console.log('🚀 App starting... loading modules');
 const connectDB = require('./config/database');
 connectDB();
