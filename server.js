@@ -1,6 +1,9 @@
 // server.js
+require('dotenv').config();
+console.log('🚀 App starting... loading modules');
 const connectDB = require('./config/database');
 connectDB();
+console.log('✅ connectDB() called successfully');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
