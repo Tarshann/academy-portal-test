@@ -1,5 +1,4 @@
 // Trigger redeploy for Heroku
-require('dotenv').config();
 
 const mongoose = require('mongoose');
 const tunnel = require('tunnel');
