@@ -404,7 +404,7 @@ router.delete('/:id/participants/:userId', auth, async (req, res) => {
   }
 });
 
-module.exports = router;._id)
+module.exports = router;
       .populate('participants.user', 'name email profileImage')
       .populate('createdBy', 'name')
       .populate('lastMessage');
