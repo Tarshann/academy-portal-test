@@ -2,9 +2,9 @@
   "name": "academy-portal",
   "version": "1.0.0",
   "description": "Communication portal for The Academy",
-  "main": "server.js",
+  "main": "index.html",
   "scripts": {
-    "start": "node server.js",
+    "start": "node index.html",
     "server": "nodemon server.js",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
