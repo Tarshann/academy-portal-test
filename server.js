@@ -50,6 +50,7 @@ app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
 });
+app.use('/api/auth', require('./routes/auth'));
 
 // Routes with comprehensive error handling
 const routeConfig = [
