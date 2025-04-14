@@ -32,6 +32,7 @@ try {
   console.error('❌ Proxy URL parsing failed:', err.message);
   process.exit(1);
 }
+console.log('🌐 Connecting to MongoDB with static IP via:', quotaguardUrl);
 
 mongoose.connect(mongodbUri, {
   useNewUrlParser: true,
