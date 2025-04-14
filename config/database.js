@@ -1,22 +1,33 @@
 // Trigger redeploy for Heroku
 require('dotenv').config();
-console.log("🧪 MONGODB_URI:", process.env.MONGODB_URI);
-console.log("🧪 QUOTAGUARDSTATIC_URL:", process.env.QUOTAGUARDSTATIC_URL);
 
 const mongoose = require('mongoose');
 const tunnel = require('tunnel');
 const { URL } = require('url');
 
+// Safely load and validate environment variables
 const mongodbUri = process.env.MONGODB_URI || '';
-const proxyUri = new URL("http://585zbj3dyfhuty:3u29igvr8cu8ma0ciyikouzu6jc0@us-east-static-04.quotaguard.com:9293");
+const quotaguardUrl = process.env.QUOTAGUARDSTATIC_URL || '';
 
-const agent = tunnel.httpsOverHttp({
-  proxy: {
-    host: "us-east-static-04.quotaguard.com",
-    port: 9293,
-    proxyAuth: "585zbj3dyfhuty:3u29igvr8cu8ma0ciyikouzu6jc0"
-  }
-});
+console.log("🧪 MONGODB_URI:", mongodbUri);
+console.log("🧪 QUOTAGUARDSTATIC_URL:", quotaguardUrl);
+
+let agent = null;
+
+try {
+  const proxyUri = new URL(quotaguardUrl);
+
+  agent = tunnel.httpsOverHttp({
+    proxy: {
+      host: proxyUri.hostname,
+      port: parseInt(proxyUri.port),
+      proxyAuth: `${proxyUri.username}:${proxyUri.password}`
+    }
+  });
+} catch (err) {
+  console.error('❌ Invalid QUOTAGUARDSTATIC_URL format:', err.message);
+  process.exit(1);
+}
 
 mongoose.connect(mongodbUri, {
   useNewUrlParser: true,
