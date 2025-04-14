@@ -1,6 +1,7 @@
 // Trigger redeploy for Heroku
 require('dotenv').config();
-console.log('🔍 QUOTAGUARDSTATIC_URL:', process.env.QUOTAGUARDSTATIC_URL);
+console.log("🧪 MONGODB_URI:", process.env.MONGODB_URI);
+console.log("🧪 QUOTAGUARDSTATIC_URL:", process.env.QUOTAGUARDSTATIC_URL);
 
 const mongoose = require('mongoose');
 const tunnel = require('tunnel');
