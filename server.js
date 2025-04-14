@@ -57,7 +57,7 @@ const routeConfig = [
   { path: '/api/admin', file: './routes/admin' },
   { path: '/api/profile', file: './routes/profile' },
   { path: '/api/conversations', file: './routes/conversation' },
-  { path: '/api/conversations', file: './routes/message' }
+  { path: '/api/conversations/:conversationId/messages', file: './routes/message' } // Fixed path
 ];
 
 routeConfig.forEach(route => {
