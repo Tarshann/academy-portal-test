@@ -1,5 +1,5 @@
 // routes/auth.js
-router.post('/register', [
+router.post('/register', async (req, res) => [
   // Validation rules
   check('firstName', 'First name is required').not().isEmpty(),
   check('lastName', 'Last name is required').not().isEmpty(),
