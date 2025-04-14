@@ -12,9 +12,9 @@ const proxyUri = new URL("http://585zbj3dyfhuty:3u29igvr8cu8ma0ciyikouzu6jc0@us-
 
 const agent = tunnel.httpsOverHttp({
   proxy: {
-    host: proxyUri.hostname,
-    port: parseInt(proxyUri.port),
-    proxyAuth: `${proxyUri.username}:${proxyUri.password}`
+    host: "us-east-static-04.quotaguard.com",
+    port: 9293,
+    proxyAuth: "585zbj3dyfhuty:3u29igvr8cu8ma0ciyikouzu6jc0"
   }
 });
 
