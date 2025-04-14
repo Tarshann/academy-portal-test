@@ -61,6 +61,10 @@ const routeConfig = [
   { path: '/api/conversations/:conversationId/messages', file: './routes/message' } // Fixed path
 ];
 
+const authRoutes = require('./routes/auth');
+app.use('/api/auth', authRoutes);
+];
+
 routeConfig.forEach(route => {
   try {
     app.use(route.path, require(route.file));
