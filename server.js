@@ -1,4 +1,5 @@
 // server.js
+console.log('🚀 App starting... loading modules');
 const connectDB = require('./config/database');
 connectDB();
 const express = require('express');
