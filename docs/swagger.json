@@ -1,4 +1,3 @@
-// Create a docs folder and add a basic swagger.json file
 const fs = require('fs');
 const path = require('path');
 
