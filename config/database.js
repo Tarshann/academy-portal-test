@@ -1,21 +1,19 @@
-// Trigger redeploy for Heroku
-
 const mongoose = require('mongoose');
 const tunnel = require('tunnel');
 const { URL } = require('url');
 
-// Safely load and validate environment variables
-const mongodbUri = process.env.MONGODB_URI || '';
-const quotaguardUrl = process.env.QUOTAGUARDSTATIC_URL || '';
+// These MUST be set in Heroku Config Vars
+const mongodbUri = process.env.MONGODB_URI;
+const quotaguardUrl = process.env.QUOTAGUARDSTATIC_URL;
 
-console.log("🧪 MONGODB_URI:", mongodbUri);
-console.log("🧪 QUOTAGUARDSTATIC_URL:", quotaguardUrl);
+if (!mongodbUri || !quotaguardUrl) {
+  console.error('❌ MONGODB_URI or QUOTAGUARDSTATIC_URL not defined.');
+  process.exit(1);
+}
 
-let agent = null;
-
+let agent;
 try {
   const proxyUri = new URL(quotaguardUrl);
-
   agent = tunnel.httpsOverHttp({
     proxy: {
       host: proxyUri.hostname,
@@ -24,7 +22,7 @@ try {
     }
   });
 } catch (err) {
-  console.error('❌ Invalid QUOTAGUARDSTATIC_URL format:', err.message);
+  console.error('❌ Proxy URL parsing failed:', err.message);
   process.exit(1);
 }
 
