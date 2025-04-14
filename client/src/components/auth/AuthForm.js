@@ -17,16 +17,17 @@ const AuthForm = ({ setAuth }) => {
   });
   
   // Registration form state
-  const [registerData, setRegisterData] = useState({
-    name: '',
-    email: '',
-    phoneNumber: '',
-    password: '',
-    confirmPassword: '',
-    childName: '',
-    address: '',
-    shirtSize: ''
-  });
+const [registerData, setRegisterData] = useState({
+  firstName: '',
+  lastName: '',
+  email: '',
+  phoneNumber: '',
+  password: '',
+  confirmPassword: '',
+  childName: '',
+  address: '',
+  shirtSize: ''
+});
   
   // Toggle between login and register forms
   const toggleForm = () => {
