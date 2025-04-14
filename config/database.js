@@ -1,45 +1,48 @@
 require('dotenv').config();
-const mongoose = require('mongoose');
 const tunnel = require('tunnel');
+const { MongoClient } = require('mongodb'); // native driver
+const mongoose = require('mongoose');
 const { URL } = require('url');
 
-const mongodbUri = process.env.MONGODB_URI;
-const quotaguardUrl = process.env.QUOTAGUARDSTATIC_URL;
+const uri = process.env.MONGODB_URI;
+const proxy = process.env.QUOTAGUARDSTATIC_URL;
 
-if (!mongodbUri || !quotaguardUrl) {
-  console.error('❌ MONGODB_URI or QUOTAGUARDSTATIC_URL not defined.');
+if (!uri || !proxy) {
+  console.error('❌ Missing Mongo URI or Proxy');
   process.exit(1);
 }
 
-let agent;
-try {
-  const proxyUri = new URL(quotaguardUrl);
+const proxyUri = new URL(proxy);
 
-  const [username, password] = proxyUri.username
-    ? [proxyUri.username, proxyUri.password]
-    : proxyUri.auth
-    ? proxyUri.auth.split(':')
-    : quotaguardUrl.replace('http://', '').split('@')[0].split(':');
+const agent = tunnel.httpsOverHttp({
+  proxy: {
+    host: proxyUri.hostname,
+    port: parseInt(proxyUri.port),
+    proxyAuth: `${proxyUri.username}:${proxyUri.password}`
+  }
+});
 
-  agent = tunnel.httpsOverHttp({
-    proxy: {
-      host: proxyUri.hostname,
-      port: parseInt(proxyUri.port),
-      proxyAuth: `${username}:${password}`
-    }
-  });
-} catch (err) {
-  console.error('❌ Proxy URL parsing failed:', err.message);
-  process.exit(1);
-}
-console.log('🌐 Connecting to MongoDB with static IP via:', quotaguardUrl);
-
-mongoose.connect(mongodbUri, {
+// Workaround: Connect with native driver first using proxy
+const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   agent
-}).then(() => {
-  console.log('✅ Connected to MongoDB via Quotaguard Static IP');
-}).catch((err) => {
-  console.error('❌ MongoDB connection error:', err);
 });
+
+client.connect()
+  .then(() => {
+    console.log('✅ Native MongoClient connected via proxy');
+
+    // Use Mongoose with already-open native connection
+    return mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+  })
+  .then(() => {
+    console.log('✅ Mongoose reconnected successfully');
+  })
+  .catch(err => {
+    console.error('❌ Connection Error:', err);
+    process.exit(1);
+  });
