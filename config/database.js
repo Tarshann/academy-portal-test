@@ -1,3 +1,4 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const tunnel = require('tunnel');
 const { URL } = require('url');
