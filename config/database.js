@@ -1,21 +1,24 @@
 const mongoose = require('mongoose');
-require('dotenv').config();
+const tunnel = require('tunnel');
+const { URL } = require('url');
 
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      retryWrites: true,
-      w: 'majority'
-    });
-    
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-    return conn;
-  } catch (error) {
-    console.error(`Error connecting to MongoDB: ${error.message}`);
-    process.exit(1);
+const mongodbUri = process.env.MONGODB_URI;
+const proxyUri = new URL(process.env.QUOTAGUARDSTATIC_URL);
+
+const agent = tunnel.httpsOverHttp({
+  proxy: {
+    host: proxyUri.hostname,
+    port: parseInt(proxyUri.port),
+    proxyAuth: `${proxyUri.username}:${proxyUri.password}`
   }
-};
+});
 
-module.exports = connectDB;
+mongoose.connect(mongodbUri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  agent
+}).then(() => {
+  console.log('✅ Connected to MongoDB via Quotaguard Static IP');
+}).catch((err) => {
+  console.error('❌ MongoDB connection error:', err);
+});
