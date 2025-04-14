@@ -4,7 +4,8 @@
   "description": "Communication portal for The Academy",
   "main": "index.html",
   "scripts": {
-    "start": "node index.html",
+    "prestart": "npm install --production=false"
+    "start": "node server.js",
     "server": "nodemon server.js",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",

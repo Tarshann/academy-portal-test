@@ -30,9 +30,6 @@ app.use(morgan('dev'));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Swagger Docs
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
 // Log each request
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
@@ -44,7 +41,11 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/profile', require('./routes/profile'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/conversations', require('./routes/conversation'));
-app.use('/api/conversations/:conversationId/messages', require('./routes/message'));
+const messageRoutes = require('./routes/message');
+app.use('/api/conversations/:conversationId/messages', (req, res, next) => {
+  req.conversationId = req.params.conversationId;
+  next();
+}, messageRoutes);
 
 // Webhook for Push Notifications
 app.post('/api/notify/webhook', (req, res) => {

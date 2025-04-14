@@ -114,3 +114,52 @@ label {
   }
 }
 
+/* Utility Classes */
+.hidden {
+  display: none !important;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Auth Section Styling */
+.auth-section {
+  max-width: 500px;
+  margin: 50px auto;
+}
+
+.auth-section h2 {
+  margin-top: 0;
+  color: var(--accent-color);
+}
+
+.toggle {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.mobile-menu {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-menu {
+    display: none;
+  }
+  
+  .mobile-menu {
+    display: block;
+  }
+  
+  .menu-toggle {
+    background: transparent;
+    border: none;
+    color: var(--secondary-color);
+    font-size: 24px;
+    cursor: pointer;
+  }
+}
