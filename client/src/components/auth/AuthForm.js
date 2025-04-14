@@ -99,7 +99,8 @@ const [registerData, setRegisterData] = useState({
     
     try {
       const res = await axios.post('/api/auth/register', {
-        name: registerData.name,
+        firstName: registerData.firstName,
+        lastName: registerData.lastName,
         email: registerData.email,
         phoneNumber: registerData.phoneNumber,
         password: registerData.password,
@@ -113,7 +114,8 @@ const [registerData, setRegisterData] = useState({
       
       // Reset form
       setRegisterData({
-        name: '',
+        firstName: '',
+        lastName: '',
         email: '',
         phoneNumber: '',
         password: '',
