@@ -90,4 +90,8 @@ router.post('/login', [
         const userData = {
           id: user.id,
           firstName: user.firstName,
-          lastName: user
+          lastName: user,lastName,
+          email: user,email,
+          role: user,role
+        };
+        
