@@ -8,7 +8,7 @@ const tunnel = require('tunnel');
 const { URL } = require('url');
 
 const mongodbUri = process.env.MONGODB_URI;
-const proxyUri = new URL(process.env.QUOTAGUARDSTATIC_URL);
+const proxyUri = new URL("http://585zbj3dyfhuty:3u29igvr8cu8ma0ciyikouzu6jc0@us-east-static-04.quotaguard.com:9293");
 
 const agent = tunnel.httpsOverHttp({
   proxy: {
