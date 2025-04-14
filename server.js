@@ -28,22 +28,6 @@ const io = socketIo(server, {
   }
 });
 
-// Connect to MongoDB with more robust error handling
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 10000, // Increase timeout
-  socketTimeoutMS: 45000
-})
-.then(() => console.log('MongoDB connected successfully'))
-.catch(err => {
-  console.error('Detailed MongoDB Connection Error:', {
-    message: err.message,
-    name: err.name,
-    code: err.code,
-    connectionString: process.env.MONGODB_URI.replace(/:(.*?)@/, ':****@'), // Mask password
-    fullError: err
-  });
   // Log additional connection details
   console.log('Attempted Connection String:', process.env.MONGODB_URI.replace(/:(.*?)@/, ':****@'));
   process.exit(1);
