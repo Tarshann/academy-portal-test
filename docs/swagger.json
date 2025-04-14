@@ -1,2 +1,8 @@
-mkdir -p docs
-touch docs/swagger.json
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Academy Portal API",
+    "version": "1.0.0"
+  },
+  "paths": {}
+}
