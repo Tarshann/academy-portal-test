@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const tunnel = require('tunnel');
 const { URL } = require('url');
 
-// These MUST be set in Heroku Config Vars
 const mongodbUri = process.env.MONGODB_URI;
 const quotaguardUrl = process.env.QUOTAGUARDSTATIC_URL;
 
@@ -15,11 +14,18 @@ if (!mongodbUri || !quotaguardUrl) {
 let agent;
 try {
   const proxyUri = new URL(quotaguardUrl);
+
+  const [username, password] = proxyUri.username
+    ? [proxyUri.username, proxyUri.password]
+    : proxyUri.auth
+    ? proxyUri.auth.split(':')
+    : quotaguardUrl.replace('http://', '').split('@')[0].split(':');
+
   agent = tunnel.httpsOverHttp({
     proxy: {
       host: proxyUri.hostname,
       port: parseInt(proxyUri.port),
-      proxyAuth: `${proxyUri.username}:${proxyUri.password}`
+      proxyAuth: `${username}:${password}`
     }
   });
 } catch (err) {
