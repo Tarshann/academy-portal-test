@@ -204,18 +204,32 @@ const [registerData, setRegisterData] = useState({
           <form onSubmit={handleRegisterSubmit}>
             <h2>Register</h2>
             
-            <div className="form-group">
-              <label htmlFor="name">Full Name</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                className="form-control"
-                value={registerData.name}
-                onChange={handleRegisterChange}
-                required
-              />
-            </div>
+           <div className="form-group">
+  <label htmlFor="firstName">First Name</label>
+  <input
+    type="text"
+    id="firstName"
+    name="firstName"
+    className="form-control"
+    value={registerData.firstName}
+    onChange={handleRegisterChange}
+    required
+  />
+</div>
+
+<div className="form-group">
+  <label htmlFor="lastName">Last Name</label>
+  <input
+    type="text"
+    id="lastName"
+    name="lastName"
+    className="form-control"
+    value={registerData.lastName}
+    onChange={handleRegisterChange}
+    required
+  />
+</div>
+
             
             <div className="form-group">
               <label htmlFor="reg-email">Email</label>
