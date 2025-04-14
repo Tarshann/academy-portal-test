@@ -28,11 +28,6 @@ const io = socketIo(server, {
   }
 });
 
-  // Log additional connection details
-  console.log('Attempted Connection String:', process.env.MONGODB_URI.replace(/:(.*?)@/, ':****@'));
-  process.exit(1);
-});
-
 // Middleware
 app.use(express.json({ extended: false }));
 app.use(cors({
