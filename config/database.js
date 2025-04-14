@@ -10,7 +10,7 @@ const agent = tunnel.httpsOverHttp({
   proxy: {
     host: proxyUri.hostname,
     port: parseInt(proxyUri.port),
-    proxyAuth: `${proxyUri.username}:${proxyUri.password}`
+    proxyAuth: `${proxyUri.Tarshann}:${proxyUri.@Samantha1}`
   }
 });
 
