@@ -25,22 +25,19 @@ router.post('/register', [
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
     user = new User({
       firstName,
       lastName,
       email,
-      password: hashedPassword,
+      password,
       phoneNumber,
-      isVerified: false
+      isEmailVerified: false
     });
 
+    const verificationToken = user.createEmailVerificationToken();
     await user.save();
 
-    const verifyToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    await sendEmail(email, 'Verify Your Email', `Click to verify: /verify/${verifyToken}`);
+    await sendEmail(email, 'Verify Your Email', `Click to verify: /verify/${verificationToken}`);
 
     res.status(201).json({ msg: 'Registration successful. Check your email to verify.' });
   } catch (err) {
@@ -62,13 +59,17 @@ router.post('/login', [
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('+password');
     if (!user) return res.status(400).json({ errors: [{ msg: 'Invalid credentials' }] });
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await user.correctPassword(password, user.password);
     if (!isMatch) return res.status(400).json({ errors: [{ msg: 'Invalid credentials' }] });
 
-    if (!user.isVerified) return res.status(401).json({ msg: 'Please verify your email first' });
+    if (!user.isEmailVerified) return res.status(401).json({ msg: 'Please verify your email first' });
+
+    // Update last login
+    user.lastLogin = Date.now();
+    await user.save({ validateBeforeSave: false });
 
     const payload = {
       user: {
@@ -88,7 +89,9 @@ router.post('/login', [
           lastName: user.lastName,
           email: user.email,
           phoneNumber: user.phoneNumber,
-          role: user.role
+          role: user.role,
+          profileImage: user.profileImage,
+          notificationPreferences: user.notificationPreferences
         }
       });
     });
