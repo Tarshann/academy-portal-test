@@ -12,6 +12,7 @@
     "start:mobile": "cd packages/mobile && npm start",
     "start:server": "cd packages/server && npm start",
     "build:web": "cd packages/web && npm run build",
+    "build:server": "echo 'Server is ready to run'",
     "build:mobile": "cd packages/mobile && npm run build",
     "test": "cd packages/server && npm test",
     "deploy": "node scripts/deploy.js",

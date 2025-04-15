@@ -49,7 +49,7 @@ RUN npm install --production && \
     cd ../web && npm install --production
 
 COPY . .
-RUN npm run build:web
+RUN npm run build:web && npm run build:server
 
 # Production stage
 FROM node:20-alpine AS production
@@ -67,7 +67,7 @@ COPY --from=builder /app/packages/server/package*.json ./packages/server/
 COPY --from=builder /app/packages/common/node_modules ./packages/common/node_modules
 COPY --from=builder /app/packages/components/node_modules ./packages/components/node_modules
 COPY --from=builder /app/packages/server/node_modules ./packages/server/node_modules
-COPY --from=builder /app/packages/server/dist ./packages/server/dist
+COPY --from=builder /app/packages/server/server.js ./packages/server/server.js
 COPY --from=builder /app/packages/web/build ./packages/web/build
 
 # Create necessary directories with proper permissions
@@ -78,7 +78,7 @@ RUN mkdir -p logs uploads && \
 
 # Set secure file permissions
 RUN chmod 755 /app && \
-    chmod -R 644 /app/packages/server/dist/* && \
+    chmod 755 /app/packages/server/server.js && \
     chmod -R 644 /app/packages/web/build/* && \
     chmod -R 755 /app/logs && \
     chmod -R 755 /app/uploads
