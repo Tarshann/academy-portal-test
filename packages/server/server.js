@@ -76,14 +76,10 @@ app.use((err, req, res, next) => {
 
 // Start Server
 const PORT = process.env.PORT || 3000;
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'client', 'build')));
 server.listen(PORT, '0.0.0.0', () =>
   console.log(`✅ Server running on port ${PORT} (${process.env.NODE_ENV})`)
 );
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
 // Global Error Catchers
 process.on('unhandledRejection', reason => console.error('🚨 Unhandled Rejection:', reason));
 process.on('uncaughtException', err => {
