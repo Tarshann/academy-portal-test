@@ -1,5 +1,5 @@
 # Base stage for both development and production
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 WORKDIR /app
 
 # Install build dependencies and curl
@@ -16,8 +16,7 @@ FROM base AS development
 ENV NODE_ENV=development
 
 # Install dependencies for all packages
-RUN npm install -g npm@latest && \
-    npm install && \
+RUN npm install && \
     cd packages/server && npm install && \
     cd ../web && npm install
 
@@ -38,15 +37,14 @@ FROM base AS builder
 ENV NODE_ENV=production
 
 # Install dependencies and build
-RUN npm install -g npm@latest && \
-    npm install --production && \
+RUN npm install --production && \
     cd packages/server && npm install --production
 
 COPY . .
 RUN npm run build:web
 
 # Production stage
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 ENV NODE_ENV=production
 WORKDIR /app
 
