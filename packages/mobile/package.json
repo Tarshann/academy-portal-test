@@ -1,0 +1,18 @@
+{
+  "name": "@academy-portal/mobile",
+  "version": "1.0.0",
+  "description": "Mobile-specific code",
+  "main": "index.js",
+  "scripts": {
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@academy-portal/common": "1.0.0",
+    "@academy-portal/components": "1.0.0",
+    "react": "^18.2.0",
+    "react-native": "^0.73.0"
+  }
+} 
