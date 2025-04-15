@@ -11,12 +11,12 @@
     "start:web": "cd packages/web && npm start",
     "start:mobile": "cd packages/mobile && npm start",
     "start:server": "cd packages/server && npm start",
-    "build:web": "cd packages/web && npm run build",
+    "build:web": "echo 'Building web package...' && cd packages/web && npm run build && echo 'Web build complete' && ls -la build",
     "build:server": "echo 'Server is ready to run'",
     "build:mobile": "cd packages/mobile && npm run build",
     "test": "cd packages/server && npm test",
     "deploy": "node scripts/deploy.js",
-    "heroku-postbuild": "cd packages/web && npm install && npm run build && cd ../server && npm install"
+    "heroku-postbuild": "cd packages/web && npm install && BUILD_PATH=../web/build npm run build && cd ../server && npm install"
   },
   "devDependencies": {
     "jest": "^29.6.0",

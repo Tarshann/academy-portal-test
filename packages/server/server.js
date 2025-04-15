@@ -29,6 +29,34 @@ app.get('/api', (req, res) => {
   res.json({ message: 'Welcome to Academy Portal API' });
 });
 
+// Static test page for diagnosing routing issues
+app.get('/test-page', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Static Test Page</title>
+        <style>
+          body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+          .success { color: green; }
+          .details { margin-top: 20px; text-align: left; max-width: 600px; margin: 20px auto; padding: 20px; background: #f5f5f5; border-radius: 5px; }
+        </style>
+      </head>
+      <body>
+        <h1 class="success">Static Test Page Working!</h1>
+        <p>If you can see this page, the server is running correctly.</p>
+        <div class="details">
+          <h3>Server Environment:</h3>
+          <pre>NODE_ENV: ${process.env.NODE_ENV}</pre>
+          <pre>PORT: ${PORT}</pre>
+          <pre>Server Time: ${new Date().toISOString()}</pre>
+          <pre>Server Directory: ${__dirname}</pre>
+        </div>
+      </body>
+    </html>
+  `);
+});
+
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
   const webBuildPath = path.join(__dirname, '../web/build');

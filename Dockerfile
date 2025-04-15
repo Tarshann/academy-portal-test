@@ -49,7 +49,10 @@ RUN npm install --production && \
     cd ../web && npm install --production
 
 COPY . .
-RUN npm run build:web && npm run build:server
+RUN npm run build:web && npm run build:server && \
+    echo "Verifying web build output:" && \
+    ls -la packages/web/build && \
+    if [ -f packages/web/build/index.html ]; then echo "index.html exists"; else echo "ERROR: index.html missing!"; exit 1; fi
 
 # Production stage
 FROM node:20-alpine AS production
