@@ -15,10 +15,12 @@ COPY packages/mobile/package*.json ./packages/mobile/
 FROM base AS development
 ENV NODE_ENV=development
 
-# Install dependencies for all packages
-RUN npm install && \
-    cd packages/server && npm install && \
-    cd ../web && npm install
+# Install dependencies for all packages using workspace
+RUN npm install -w @academy-portal/common && \
+    npm install -w @academy-portal/components && \
+    npm install -w @academy-portal/server && \
+    npm install -w @academy-portal/web && \
+    npm install -w @academy-portal/mobile
 
 # Copy source code
 COPY . .
@@ -36,9 +38,11 @@ CMD ["npm", "run", "start:server"]
 FROM base AS builder
 ENV NODE_ENV=production
 
-# Install dependencies and build
-RUN npm install --production && \
-    cd packages/server && npm install --production
+# Install dependencies and build using workspace
+RUN npm install --production -w @academy-portal/common && \
+    npm install --production -w @academy-portal/components && \
+    npm install --production -w @academy-portal/server && \
+    npm install --production -w @academy-portal/web
 
 COPY . .
 RUN npm run build:web

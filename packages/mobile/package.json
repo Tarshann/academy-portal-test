@@ -10,8 +10,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "@academy-portal/common": "1.0.0",
-    "@academy-portal/components": "1.0.0",
+    "@academy-portal/common": "workspace:*",
+    "@academy-portal/components": "workspace:*",
     "react": "^18.2.0",
     "react-native": "^0.73.0"
   }

@@ -14,9 +14,9 @@ try {
     execSync('npm install', { cwd: webPath, stdio: 'inherit' });
   }
 
-  // Build the web app
+  // Use npm workspaces to build the web app
   console.log('Running build script...');
-  execSync('npm run build', { cwd: webPath, stdio: 'inherit' });
+  execSync('npm run build -w @academy-portal/web', { stdio: 'inherit' });
 
   console.log('Web application built successfully!');
 } catch (error) {
