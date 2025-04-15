@@ -7,6 +7,8 @@ RUN apk add --no-cache python3 make g++ curl
 
 # Copy package files for all workspaces
 COPY package*.json ./
+COPY packages/common/package*.json ./packages/common/
+COPY packages/components/package*.json ./packages/components/
 COPY packages/server/package*.json ./packages/server/
 COPY packages/web/package*.json ./packages/web/
 COPY packages/mobile/package*.json ./packages/mobile/
@@ -15,12 +17,13 @@ COPY packages/mobile/package*.json ./packages/mobile/
 FROM base AS development
 ENV NODE_ENV=development
 
-# Install dependencies for all packages using workspace
-RUN npm install -w @academy-portal/common && \
-    npm install -w @academy-portal/components && \
-    npm install -w @academy-portal/server && \
-    npm install -w @academy-portal/web && \
-    npm install -w @academy-portal/mobile
+# Install dependencies for all packages
+RUN npm install && \
+    cd packages/common && npm install && \
+    cd ../components && npm install && \
+    cd ../server && npm install && \
+    cd ../web && npm install && \
+    cd ../mobile && npm install
 
 # Copy source code
 COPY . .
@@ -38,11 +41,12 @@ CMD ["npm", "run", "start:server"]
 FROM base AS builder
 ENV NODE_ENV=production
 
-# Install dependencies and build using workspace
-RUN npm install --production -w @academy-portal/common && \
-    npm install --production -w @academy-portal/components && \
-    npm install --production -w @academy-portal/server && \
-    npm install --production -w @academy-portal/web
+# Install dependencies and build
+RUN npm install --production && \
+    cd packages/common && npm install --production && \
+    cd ../components && npm install --production && \
+    cd ../server && npm install --production && \
+    cd ../web && npm install --production
 
 COPY . .
 RUN npm run build:web
@@ -57,7 +61,11 @@ RUN apk add --no-cache curl
 
 # Copy production dependencies and built assets
 COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/packages/common/package*.json ./packages/common/
+COPY --from=builder /app/packages/components/package*.json ./packages/components/
 COPY --from=builder /app/packages/server/package*.json ./packages/server/
+COPY --from=builder /app/packages/common/node_modules ./packages/common/node_modules
+COPY --from=builder /app/packages/components/node_modules ./packages/components/node_modules
 COPY --from=builder /app/packages/server/node_modules ./packages/server/node_modules
 COPY --from=builder /app/packages/server/dist ./packages/server/dist
 COPY --from=builder /app/packages/web/build ./packages/web/build

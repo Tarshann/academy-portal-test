@@ -27,11 +27,11 @@ app.get('/api', (req, res) => {
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
   // Serve web build folder
-  app.use(express.static(path.join(__dirname, '../../web/build')));
+  app.use(express.static(path.join(__dirname, '../web/build')));
   
   // Handle React routing
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../web/build', 'index.html'));
+    res.sendFile(path.join(__dirname, '../web/build', 'index.html'));
   });
 }
 

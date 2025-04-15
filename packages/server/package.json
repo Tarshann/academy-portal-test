@@ -9,7 +9,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@academy-portal/common": "workspace:*",
+    "@academy-portal/common": "file:../common",
     "express": "^4.18.2",
     "mongoose": "^8.0.1",
     "cors": "^2.8.5",
