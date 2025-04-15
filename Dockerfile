@@ -41,18 +41,29 @@ CMD ["npm", "run", "start:server"]
 FROM base AS builder
 ENV NODE_ENV=production
 
-# Install dependencies and build
-RUN npm install --production && \
-    cd packages/common && npm install --production && \
-    cd ../components && npm install --production && \
-    cd ../server && npm install --production && \
-    cd ../web && npm install --production
+# Install all dependencies (including dev dependencies for building)
+RUN npm install && \
+    cd packages/common && npm install && \
+    cd ../components && npm install && \
+    cd ../server && npm install && \
+    cd ../web && npm install
 
+# Copy source code
 COPY . .
-RUN npm run build:web && npm run build:server && \
-    echo "Verifying web build output:" && \
-    ls -la packages/web/build && \
-    if [ -f packages/web/build/index.html ]; then echo "index.html exists"; else echo "ERROR: index.html missing!"; exit 1; fi
+
+# Build web app with verbose logging
+RUN echo "Starting web build process..." && \
+    mkdir -p packages/web/build && \
+    cd packages/web && npm run build && \
+    echo "Web build completed" && \
+    ls -la build && \
+    if [ -f "build/index.html" ]; then \
+      echo "index.html exists and has size:" && \
+      ls -la build/index.html; \
+    else \
+      echo "ERROR: index.html missing!" && \
+      exit 1; \
+    fi
 
 # Production stage
 FROM node:20-alpine AS production
@@ -71,7 +82,11 @@ COPY --from=builder /app/packages/common/node_modules ./packages/common/node_mod
 COPY --from=builder /app/packages/components/node_modules ./packages/components/node_modules
 COPY --from=builder /app/packages/server/node_modules ./packages/server/node_modules
 COPY --from=builder /app/packages/server/server.js ./packages/server/server.js
-COPY --from=builder /app/packages/web/build ./packages/web/build
+
+# Copy the web build, ensuring we actually copy the directory
+RUN mkdir -p /app/packages/web
+COPY --from=builder /app/packages/web/build /app/packages/web/build
+RUN ls -la /app/packages/web/build
 
 # Create necessary directories with proper permissions
 RUN mkdir -p logs uploads && \
@@ -82,7 +97,8 @@ RUN mkdir -p logs uploads && \
 # Set secure file permissions
 RUN chmod 755 /app && \
     chmod 755 /app/packages/server/server.js && \
-    chmod -R 644 /app/packages/web/build/* && \
+    find /app/packages/web/build -type d -exec chmod 755 {} \; && \
+    find /app/packages/web/build -type f -exec chmod 644 {} \; && \
     chmod -R 755 /app/logs && \
     chmod -R 755 /app/uploads
 
