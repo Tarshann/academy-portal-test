@@ -41,4 +41,15 @@ __tests__
 # Mobile specific
 packages/mobile/android/app/build
 packages/mobile/ios/build
-packages/mobile/ios/Pods 
+packages/mobile/ios/Pods
+
+EMAIL_FROM=hi@demomailtrap.co
+EMAIL_HOST=sandbox.smtp.mailtrap.io
+EMAIL_PASSWORD=[secured]
+EMAIL_USER=[secured]
+FRONTEND_URL=https://academy-portal-test.herokuapp.com
+JWT_EXPIRES_IN=7d
+JWT_SECRET=[secured]
+MONGODB_URI=mongodb+srv://[connection string]
+NODE_ENV=production
+QUOTAGUARDSTATIC_URL=http://[secured]

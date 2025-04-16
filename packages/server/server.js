@@ -3,12 +3,34 @@ const cors = require('cors');
 const path = require('path');
 const dotenv = require('dotenv');
 const fs = require('fs');
+const http = require('http');
+const socketIo = require('socket.io');
+const connectDB = require('./db');
+const setupSocketIO = require('./socket');
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Create HTTP server
+const server = http.createServer(app);
+
+// Create Socket.IO instance
+const io = socketIo(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL || '*',
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
+
+// Connect to MongoDB
+connectDB();
+
+// Setup Socket.IO
+setupSocketIO(io);
 
 // Log startup information
 console.log('=== SERVER STARTING ===');
@@ -32,6 +54,11 @@ app.get('/health', (req, res) => {
 });
 
 // API routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/groups', require('./routes/groups'));
+app.use('/api/messages', require('./routes/messages'));
+app.use('/api/notifications', require('./routes/notifications'));
+
 app.get('/api', (req, res) => {
   res.json({ message: 'Welcome to Academy Portal API' });
 });
@@ -150,6 +177,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Start server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 }); 
