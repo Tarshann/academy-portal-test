@@ -2,69 +2,49 @@ const express = require('express');
 const router = express.Router();
 const Notification = require('../models/Notification');
 const { protect } = require('../middleware/auth');
+const PushNotificationService = require('../services/pushNotifications');
+const User = require('../models/User');
 
 // @desc    Get user notifications
 // @route   GET /api/notifications
 // @access  Private
 router.get('/', protect, async (req, res) => {
   try {
-    const { page = 1, limit = 20, read } = req.query;
-    
-    // Build query
-    const query = { recipient: req.user.id };
-    
-    // Filter by read status if provided
-    if (read === 'true') query.read = true;
-    if (read === 'false') query.read = false;
+    const { page = 1, limit = 20 } = req.query;
     
     // Pagination
     const skip = (parseInt(page) - 1) * parseInt(limit);
     
     // Get notifications
-    const notifications = await Notification.find(query)
+    const notifications = await Notification.find({ recipient: req.user.id })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit))
-      .populate({
-        path: 'sender',
-        select: 'firstName lastName email profileImage',
-      })
-      .populate({
-        path: 'group',
-        select: 'name type image',
-      });
+      .populate('sender', 'firstName lastName email profileImage')
+      .populate('group', 'name');
     
-    // Count total notifications
-    const total = await Notification.countDocuments(query);
+    // Get count
+    const total = await Notification.countDocuments({ recipient: req.user.id });
     
-    // Calculate unread count
-    const unreadCount = await Notification.countDocuments({
+    // Get unread count
+    const unreadCount = await Notification.countDocuments({ 
       recipient: req.user.id,
-      read: false,
+      isRead: false
     });
     
-    // Pagination info
-    const pagination = {
-      total,
-      page: parseInt(page),
-      limit: parseInt(limit),
-      pages: Math.ceil(total / parseInt(limit)),
-    };
-    
-    res.status(200).json({
-      success: true,
-      count: notifications.length,
-      pagination,
-      unreadCount,
-      data: notifications,
+    res.json({
+      notifications,
+      pagination: {
+        total,
+        page: parseInt(page),
+        pages: Math.ceil(total / parseInt(limit)),
+        limit: parseInt(limit)
+      },
+      unreadCount
     });
   } catch (error) {
-    console.error('Get notifications error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error',
-      error: error.message,
-    });
+    console.error('Error getting notifications:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
@@ -76,34 +56,23 @@ router.put('/:id/read', protect, async (req, res) => {
     const notification = await Notification.findById(req.params.id);
     
     if (!notification) {
-      return res.status(404).json({
-        success: false,
-        message: 'Notification not found',
-      });
+      return res.status(404).json({ message: 'Notification not found' });
     }
     
-    // Check if user is recipient
+    // Check if notification belongs to user
     if (notification.recipient.toString() !== req.user.id) {
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to update this notification',
-      });
+      return res.status(403).json({ message: 'Not authorized' });
     }
     
     // Mark as read
-    await notification.markAsRead();
+    notification.isRead = true;
+    notification.readAt = Date.now();
+    await notification.save();
     
-    res.status(200).json({
-      success: true,
-      data: notification,
-    });
+    res.json({ message: 'Notification marked as read' });
   } catch (error) {
-    console.error('Mark notification read error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error',
-      error: error.message,
-    });
+    console.error('Error marking notification as read:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
@@ -112,24 +81,15 @@ router.put('/:id/read', protect, async (req, res) => {
 // @access  Private
 router.put('/read-all', protect, async (req, res) => {
   try {
-    // Update all unread notifications for the user
-    const result = await Notification.updateMany(
-      { recipient: req.user.id, read: false },
-      { read: true, readAt: Date.now() }
+    await Notification.updateMany(
+      { recipient: req.user.id, isRead: false },
+      { isRead: true, readAt: Date.now() }
     );
     
-    res.status(200).json({
-      success: true,
-      count: result.modifiedCount,
-      message: `Marked ${result.modifiedCount} notifications as read`,
-    });
+    res.json({ message: 'All notifications marked as read' });
   } catch (error) {
-    console.error('Mark all notifications read error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error',
-      error: error.message,
-    });
+    console.error('Error marking all notifications as read:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
@@ -181,7 +141,7 @@ router.delete('/read', protect, async (req, res) => {
     // Delete all read notifications for the user
     const result = await Notification.deleteMany({
       recipient: req.user.id,
-      read: true,
+      isRead: true,
     });
     
     res.status(200).json({
@@ -207,7 +167,7 @@ router.get('/unread/count', protect, async (req, res) => {
     // Count unread notifications
     const count = await Notification.countDocuments({
       recipient: req.user.id,
-      read: false,
+      isRead: false,
     });
     
     res.status(200).json({
@@ -221,6 +181,61 @@ router.get('/unread/count', protect, async (req, res) => {
       message: 'Server error',
       error: error.message,
     });
+  }
+});
+
+// @route   POST /api/notifications/push-token
+// @desc    Save or update push notification token
+// @access  Private
+router.post('/push-token', protect, async (req, res) => {
+  try {
+    const { token } = req.body;
+    
+    if (!token) {
+      return res.status(400).json({ message: 'Token is required' });
+    }
+    
+    // Update user's push token
+    await User.findByIdAndUpdate(req.user.id, {
+      pushToken: token
+    });
+    
+    res.json({ message: 'Push token updated' });
+  } catch (error) {
+    console.error('Error updating push token:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/notifications/test
+// @desc    Send a test notification
+// @access  Private
+router.post('/test', protect, async (req, res) => {
+  try {
+    // Get user
+    const user = await User.findById(req.user.id);
+    
+    if (!user.pushToken) {
+      return res.status(400).json({ message: 'No push token found' });
+    }
+    
+    // Send test notification
+    const result = await PushNotificationService.sendPushNotification(
+      user.pushToken,
+      {
+        title: 'Test Notification',
+        body: 'This is a test notification',
+        data: {
+          type: 'test',
+          timestamp: Date.now()
+        }
+      }
+    );
+    
+    res.json({ message: 'Test notification sent', result });
+  } catch (error) {
+    console.error('Error sending test notification:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

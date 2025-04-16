@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Test Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .input-container {
+            display: flex;
+        }
+        #messageInput {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-left: 5px;
+            border-radius: 5px;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        .received {
+            background-color: #f1f1f1;
+            align-self: flex-start;
+        }
+        .sent {
+            background-color: #d1e7dd;
+            align-self: flex-end;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chat Test Client</h1>
+        
+        <div id="connection-status" style="margin-bottom: 10px;">
+            Status: <span id="status">Disconnected</span>
+        </div>
+        
+        <div id="auth-section">
+            <input type="text" id="jwt-token" placeholder="Enter JWT token" style="width: 300px;">
+            <button id="connect-btn">Connect</button>
+        </div>
+        
+        <div id="chat-section" style="display: none;">
+            <div id="messages"></div>
+            
+            <div class="input-container">
+                <input type="text" id="messageInput" placeholder="Type a message...">
+                <button id="send-btn">Send</button>
+                <button id="typing-btn">Typing...</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        let socket;
+        const statusEl = document.getElementById('status');
+        const messagesEl = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const connectBtn = document.getElementById('connect-btn');
+        const sendBtn = document.getElementById('send-btn');
+        const typingBtn = document.getElementById('typing-btn');
+        const jwtTokenInput = document.getElementById('jwt-token');
+        const authSection = document.getElementById('auth-section');
+        const chatSection = document.getElementById('chat-section');
+        
+        // Connect to socket.io server
+        connectBtn.addEventListener('click', () => {
+            const token = jwtTokenInput.value.trim();
+            if (!token) {
+                alert('Please enter a JWT token');
+                return;
+            }
+            
+            try {
+                socket = io('http://localhost:3001', {
+                    auth: {
+                        token
+                    }
+                });
+                
+                // Connection events
+                socket.on('connect', () => {
+                    statusEl.textContent = 'Connected';
+                    authSection.style.display = 'none';
+                    chatSection.style.display = 'block';
+                    addMessage('System', 'Connected to server', 'system');
+                });
+                
+                socket.on('connect_error', (err) => {
+                    statusEl.textContent = `Error: ${err.message}`;
+                    addMessage('System', `Connection error: ${err.message}`, 'error');
+                });
+                
+                socket.on('disconnect', () => {
+                    statusEl.textContent = 'Disconnected';
+                    authSection.style.display = 'block';
+                    chatSection.style.display = 'none';
+                    addMessage('System', 'Disconnected from server', 'system');
+                });
+                
+                // Message events
+                socket.on('message:received', (data) => {
+                    addMessage(
+                        `${data.sender.firstName} ${data.sender.lastName}`, 
+                        data.content, 
+                        'received'
+                    );
+                });
+                
+                socket.on('message:sent', (data) => {
+                    addMessage('You', data.content, 'sent');
+                });
+                
+                // Typing events
+                socket.on('typing:started', (data) => {
+                    const typingEl = document.getElementById('typing-indicator');
+                    if (!typingEl) {
+                        const el = document.createElement('div');
+                        el.id = 'typing-indicator';
+                        el.textContent = `${data.user.firstName} is typing...`;
+                        el.style.fontStyle = 'italic';
+                        el.style.color = '#666';
+                        el.style.marginBottom = '10px';
+                        messagesEl.appendChild(el);
+                    }
+                });
+                
+                socket.on('typing:stopped', (data) => {
+                    const typingEl = document.getElementById('typing-indicator');
+                    if (typingEl) {
+                        typingEl.remove();
+                    }
+                });
+                
+                // Groups joined event
+                socket.on('groups:joined', (data) => {
+                    addMessage(
+                        'System', 
+                        `Joined ${data.count} groups: ${data.groups.map(g => g.name).join(', ')}`, 
+                        'system'
+                    );
+                });
+                
+                // Error event
+                socket.on('error', (data) => {
+                    addMessage('Error', data.message, 'error');
+                });
+                
+            } catch (error) {
+                statusEl.textContent = `Error: ${error.message}`;
+                addMessage('System', `Error initializing connection: ${error.message}`, 'error');
+            }
+        });
+        
+        // Send message
+        sendBtn.addEventListener('click', () => {
+            const message = messageInput.value.trim();
+            if (!message || !socket) return;
+            
+            // Get the first group from the joined groups
+            // In a real app, you would select the group from a list
+            const firstGroupEl = document.querySelector('.group-item');
+            if (!firstGroupEl) {
+                addMessage('System', 'No groups available to send messages to', 'error');
+                return;
+            }
+            
+            const groupId = firstGroupEl.dataset.id;
+            
+            socket.emit('message:send', {
+                groupId,
+                content: message
+            });
+            
+            messageInput.value = '';
+        });
+        
+        // Typing indicator
+        typingBtn.addEventListener('click', () => {
+            // Get the first group from the joined groups
+            const firstGroupEl = document.querySelector('.group-item');
+            if (!firstGroupEl) return;
+            
+            const groupId = firstGroupEl.dataset.id;
+            
+            // Start typing
+            socket.emit('typing:start', { groupId });
+            
+            // Stop typing after 2 seconds
+            setTimeout(() => {
+                socket.emit('typing:stop', { groupId });
+            }, 2000);
+        });
+        
+        // Add message to the chat
+        function addMessage(sender, content, type) {
+            const msgEl = document.createElement('div');
+            msgEl.className = `message ${type}`;
+            
+            const senderEl = document.createElement('div');
+            senderEl.style.fontWeight = 'bold';
+            senderEl.textContent = sender;
+            
+            const contentEl = document.createElement('div');
+            contentEl.textContent = content;
+            
+            msgEl.appendChild(senderEl);
+            msgEl.appendChild(contentEl);
+            
+            // Add group info to the DOM if it's a groups:joined event
+            if (type === 'system' && content.includes('Joined')) {
+                const groups = socket._callbacks.$['groups:joined'][0].arguments[0].groups;
+                
+                if (groups && groups.length > 0) {
+                    const groupsContainer = document.createElement('div');
+                    groupsContainer.style.marginTop = '10px';
+                    
+                    groups.forEach(group => {
+                        const groupEl = document.createElement('div');
+                        groupEl.className = 'group-item';
+                        groupEl.dataset.id = group.id;
+                        groupEl.textContent = `Group: ${group.name} (ID: ${group.id})`;
+                        groupEl.style.padding = '5px';
+                        groupEl.style.backgroundColor = '#eee';
+                        groupEl.style.marginBottom = '5px';
+                        groupEl.style.borderRadius = '3px';
+                        groupsContainer.appendChild(groupEl);
+                    });
+                    
+                    msgEl.appendChild(groupsContainer);
+                }
+            }
+            
+            messagesEl.appendChild(msgEl);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+    </script>
+</body>
+</html> 

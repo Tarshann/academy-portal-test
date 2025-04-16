@@ -14,19 +14,27 @@ const MessageSchema = new mongoose.Schema(
     },
     content: {
       type: String,
-      required: [true, 'Message content is required'],
       trim: true,
     },
     attachments: [
       {
+        url: {
+          type: String,
+          required: true,
+        },
         type: {
           type: String,
-          enum: ['image', 'file', 'video', 'audio'],
+          enum: ['image', 'document', 'video', 'audio'],
+          default: 'image',
         },
-        url: String,
-        name: String,
-        size: Number,
-        mimetype: String,
+        name: {
+          type: String,
+          default: '',
+        },
+        size: {
+          type: Number,
+          default: 0,
+        },
       },
     ],
     readBy: [
@@ -72,15 +80,22 @@ const MessageSchema = new mongoose.Schema(
 // Index for querying messages by group
 MessageSchema.index({ group: 1, createdAt: -1 });
 
-// Mark message as read by a user
+// Mark message as read by a specific user
 MessageSchema.methods.markAsRead = async function (userId) {
-  if (!this.readBy.some(reader => reader.user.toString() === userId.toString())) {
+  // Check if already read by this user
+  const isRead = this.readBy.some(
+    read => read.user.toString() === userId.toString()
+  );
+  
+  if (!isRead) {
     this.readBy.push({
       user: userId,
-      readAt: Date.now(),
+      readAt: new Date(),
     });
-    await this.save();
+    
+    return this.save();
   }
+  
   return this;
 };
 
@@ -99,18 +114,18 @@ MessageSchema.methods.editContent = async function (newContent) {
   return this.save();
 };
 
-// Soft delete message
-MessageSchema.methods.softDelete = async function () {
+// Mark message as deleted
+MessageSchema.methods.markAsDeleted = async function () {
   this.isDeleted = true;
   return this.save();
 };
 
-// Get unread messages for a user in a group
-MessageSchema.statics.getUnreadCount = async function (groupId, userId) {
+// Static method to get unread messages count for a user in a group
+MessageSchema.statics.getUnreadCount = async function (userId, groupId) {
   return this.countDocuments({
     group: groupId,
-    'readBy.user': { $ne: userId },
     sender: { $ne: userId },
+    'readBy.user': { $ne: userId },
     isDeleted: false,
   });
 };

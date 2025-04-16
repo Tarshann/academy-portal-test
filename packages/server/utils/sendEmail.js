@@ -1,36 +1,41 @@
 const nodemailer = require('nodemailer');
 
 /**
- * Send an email
+ * Send an email using Nodemailer
  * @param {Object} options - Email options
- * @param {String} options.to - Recipient email
+ * @param {String} options.to - Recipient email address
  * @param {String} options.subject - Email subject
- * @param {String} options.text - Plain text content
- * @param {String} options.html - HTML content
+ * @param {String} options.text - Plain text email body
+ * @param {String} options.html - HTML email body (optional)
+ * @returns {Promise<object>} - Nodemailer info object
  */
 const sendEmail = async (options) => {
   // Create a transporter
   const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: 587,
-    secure: false,
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: process.env.SMTP_SECURE === 'true',
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASSWORD,
     },
   });
 
-  // Message options
-  const message = {
-    from: `${process.env.FROM_NAME || 'Academy Portal'} <${process.env.EMAIL_FROM}>`,
+  // Define email options
+  const mailOptions = {
+    from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
     to: options.to,
     subject: options.subject,
-    text: options.text || 'No text content provided',
-    html: options.html || '<p>No HTML content provided</p>',
+    text: options.text,
   };
 
+  // Add HTML content if provided
+  if (options.html) {
+    mailOptions.html = options.html;
+  }
+
   // Send email
-  const info = await transporter.sendMail(message);
+  const info = await transporter.sendMail(mailOptions);
   
   console.log(`Email sent: ${info.messageId}`);
   

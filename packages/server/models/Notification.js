@@ -13,39 +13,8 @@ const NotificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: [
-        'message',
-        'group_invitation',
-        'group_join',
-        'group_leave',
-        'role_change',
-        'system',
-        'announcement'
-      ],
+      enum: ['message', 'group_invite', 'group_join', 'group_leave', 'system'],
       required: true,
-    },
-    title: {
-      type: String,
-      required: true,
-    },
-    content: {
-      type: String,
-      required: true,
-    },
-    read: {
-      type: Boolean,
-      default: false,
-    },
-    readAt: {
-      type: Date,
-    },
-    metadata: {
-      type: Map,
-      of: mongoose.Schema.Types.Mixed,
-      default: {},
-    },
-    link: {
-      type: String,
     },
     group: {
       type: mongoose.Schema.Types.ObjectId,
@@ -54,6 +23,29 @@ const NotificationSchema = new mongoose.Schema(
     message: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Message',
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    body: {
+      type: String,
+      required: true,
+    },
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
+    readAt: {
+      type: Date,
+    },
+    metadata: {
+      type: Map,
+      of: String,
+      default: {},
+    },
+    link: {
+      type: String,
     },
     priority: {
       type: String,
@@ -69,15 +61,18 @@ const NotificationSchema = new mongoose.Schema(
   }
 );
 
-// Index for querying notifications by recipient
+// Index for faster queries on user's notifications
 NotificationSchema.index({ recipient: 1, createdAt: -1 });
-NotificationSchema.index({ recipient: 1, read: 1 });
+NotificationSchema.index({ recipient: 1, isRead: 1 });
 
 // Mark notification as read
 NotificationSchema.methods.markAsRead = async function () {
-  this.read = true;
-  this.readAt = Date.now();
-  return this.save();
+  if (!this.isRead) {
+    this.isRead = true;
+    this.readAt = new Date();
+    return this.save();
+  }
+  return this;
 };
 
 // Create a system notification
@@ -86,7 +81,7 @@ NotificationSchema.statics.createSystemNotification = async function (recipientI
     recipient: recipientId,
     type: 'system',
     title,
-    content,
+    body: content,
     priority: options.priority || 'normal',
     link: options.link,
     expiresAt: options.expiresAt,
@@ -95,20 +90,30 @@ NotificationSchema.statics.createSystemNotification = async function (recipientI
 };
 
 // Create a message notification
-NotificationSchema.statics.createMessageNotification = async function (recipientId, senderId, groupId, messageId, content) {
+NotificationSchema.statics.createMessageNotification = async function (recipientId, senderId, groupId, messageId, messageContent) {
+  const sender = await mongoose.model('User').findById(senderId);
+  
+  if (!sender) {
+    throw new Error('Sender not found');
+  }
+  
+  const trimmedContent = messageContent.length > 50 
+    ? `${messageContent.substring(0, 50)}...` 
+    : messageContent;
+  
   return this.create({
     recipient: recipientId,
     sender: senderId,
     type: 'message',
-    title: 'New Message',
-    content: content.length > 50 ? content.substring(0, 50) + '...' : content,
     group: groupId,
     message: messageId,
-    link: `/groups/${groupId}?message=${messageId}`,
+    title: `New message from ${sender.firstName} ${sender.lastName}`,
+    body: trimmedContent,
     metadata: {
+      senderName: `${sender.firstName} ${sender.lastName}`,
       messageId: messageId.toString(),
-      groupId: groupId.toString(),
-    },
+      groupId: groupId.toString()
+    }
   });
 };
 
@@ -117,9 +122,9 @@ NotificationSchema.statics.createGroupInvitationNotification = async function (r
   return this.create({
     recipient: recipientId,
     sender: senderId,
-    type: 'group_invitation',
+    type: 'group_invite',
     title: 'Group Invitation',
-    content: `You have been invited to join the group: ${groupName}`,
+    body: `You have been invited to join the group: ${groupName}`,
     group: groupId,
     link: `/groups/${groupId}`,
     metadata: {
@@ -134,7 +139,7 @@ NotificationSchema.statics.createGroupInvitationNotification = async function (r
 NotificationSchema.statics.getUnreadCount = async function (userId) {
   return this.countDocuments({
     recipient: userId,
-    read: false,
+    isRead: false,
   });
 };
 

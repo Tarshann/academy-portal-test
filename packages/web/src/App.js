@@ -1,21 +1,121 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from 'react-router-dom';
+import Login from './pages/Login';
+import SignUp from './pages/SignUp';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import Home from './pages/Home';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { CssBaseline, Box, CircularProgress, Typography } from '@mui/material';
 
+// // Simple Authentication check (replace with real auth context later)
+// const useAuth = () => {
+//   // Placeholder: check local storage or context
+//   // For now, let's assume the user is not logged in initially
+//   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+//   // Example function to simulate login
+//   const login = () => setIsAuthenticated(true);
+//   // Example function to simulate logout
+//   const logout = () => setIsAuthenticated(false);
+
+//   // If you need to check a token on load:
+//   // useEffect(() => {
+//   //   const token = localStorage.getItem('token');
+//   //   if (token) {
+//   //     setIsAuthenticated(true);
+//   //   }
+//   // }, []);
+
+//   return { isAuthenticated, login, logout }; // Provide login/logout for components if needed
+// };
+
+// Main App component that sets up routing
 function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <CssBaseline />
+        <AppRoutes />
+      </Router>
+    </AuthProvider>
+  );
+}
+
+// Component to handle routing logic based on auth state
+function AppRoutes() {
+  const { isAuthenticated, loading } = useAuth();
+
   useEffect(() => {
-    console.log('App component mounted');
     document.title = 'Academy Portal';
   }, []);
 
+  // Show loading spinner while checking auth status
+  if (loading) {
+    return (
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          minHeight: '100vh' 
+        }}
+      >
+        <CircularProgress />
+        <Typography sx={{ ml: 2 }}>Loading...</Typography>
+      </Box>
+    );
+  }
+
   return (
-    <div className="App">
-      <header className="App-header" style={{ textAlign: 'center', marginTop: '50px' }}>
-        <h1>Academy Portal</h1>
-        <p>Welcome to the Academy Portal Web Application</p>
-      </header>
-      <div style={{ textAlign: 'center', marginTop: '20px' }}>
-        <p>If you can see this, the application is working correctly!</p>
-      </div>
-    </div>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Switch>
+        <Route path="/login">
+          {isAuthenticated ? <Redirect to="/" /> : <Login />}
+        </Route>
+        <Route path="/signup">
+          {isAuthenticated ? <Redirect to="/" /> : <SignUp />}
+        </Route>
+        <Route path="/forgot-password">
+          {isAuthenticated ? <Redirect to="/" /> : <ForgotPassword />}
+        </Route>
+        <Route path="/reset-password/:resetToken">
+          {isAuthenticated ? <Redirect to="/" /> : <ResetPassword />}
+        </Route>
+        <PrivateRoute exact path="/" isAuthenticated={isAuthenticated}>
+          <Home />
+        </PrivateRoute>
+        {/* Add other private/public routes here */}
+        
+        <Redirect from="*" to={isAuthenticated ? "/" : "/login"} />
+      </Switch>
+    </Box>
+  );
+}
+
+// Wrapper for private routes
+function PrivateRoute({ children, isAuthenticated, ...rest }) {
+  return (
+    <Route
+      {...rest}
+      render={({ location }) =>
+        isAuthenticated ? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/login",
+              state: { from: location }
+            }}
+          />
+        )
+      }
+    />
   );
 }
 

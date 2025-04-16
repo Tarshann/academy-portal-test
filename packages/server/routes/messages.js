@@ -10,87 +10,48 @@ const { protect } = require('../middleware/auth');
 router.get('/:groupId', protect, async (req, res) => {
   try {
     const { groupId } = req.params;
-    const { page = 1, limit = 50 } = req.query;
-
-    // Check if group exists and user is a member
+    const { limit = 50, before } = req.query;
+    
+    // Check if user is in the group
     const group = await Group.findById(groupId);
     if (!group) {
-      return res.status(404).json({
-        success: false,
-        message: 'Group not found',
-      });
+      return res.status(404).json({ message: 'Group not found' });
     }
-
+    
     if (!group.isMember(req.user.id)) {
-      return res.status(403).json({
-        success: false,
-        message: 'You are not a member of this group',
-      });
+      return res.status(403).json({ message: 'Not a member of this group' });
     }
-
-    // Pagination
-    const skip = (parseInt(page) - 1) * parseInt(limit);
-
-    // Get messages
-    const messages = await Message.find({
-      group: groupId,
-      isDeleted: false,
-    })
+    
+    // Build query to get messages
+    let query = { group: groupId };
+    
+    // If 'before' is provided, get messages before that timestamp
+    if (before) {
+      query.createdAt = { $lt: new Date(before) };
+    }
+    
+    const messages = await Message.find(query)
       .sort({ createdAt: -1 })
-      .skip(skip)
       .limit(parseInt(limit))
       .populate({
         path: 'sender',
-        select: 'firstName lastName email profileImage',
+        select: 'firstName lastName email profileImage'
       });
-
-    // Count total messages
-    const total = await Message.countDocuments({
-      group: groupId,
-      isDeleted: false,
-    });
-
-    // Mark messages as read by the current user
+    
+    // Mark messages as read
     const messageIds = messages.map(message => message._id);
     if (messageIds.length > 0) {
       await Message.updateMany(
-        {
-          _id: { $in: messageIds },
-          'readBy.user': { $ne: req.user.id },
-          sender: { $ne: req.user.id },
-        },
-        {
-          $push: {
-            readBy: {
-              user: req.user.id,
-              readAt: Date.now(),
-            },
-          },
-        }
+        { _id: { $in: messageIds }, 'readBy.user': { $ne: req.user.id } },
+        { $push: { readBy: { user: req.user.id, readAt: new Date() } } }
       );
     }
-
-    // Pagination info
-    const pagination = {
-      total,
-      page: parseInt(page),
-      limit: parseInt(limit),
-      pages: Math.ceil(total / parseInt(limit)),
-    };
-
-    res.status(200).json({
-      success: true,
-      count: messages.length,
-      pagination,
-      data: messages,
-    });
+    
+    // Return messages in reverse order (oldest first)
+    res.json(messages.reverse());
   } catch (error) {
-    console.error('Get messages error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error',
-      error: error.message,
-    });
+    console.error('Error getting messages:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

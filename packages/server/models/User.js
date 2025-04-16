@@ -5,101 +5,94 @@ const crypto = require('crypto');
 
 const UserSchema = new mongoose.Schema(
   {
-    email: {
-      type: String,
-      required: [true, 'Please provide an email'],
-      unique: true,
-      match: [
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-        'Please provide a valid email',
-      ],
-    },
-    password: {
-      type: String,
-      required: [true, 'Please provide a password'],
-      minlength: 6,
-      select: false,
-    },
     firstName: {
       type: String,
-      required: [true, 'Please provide a first name'],
-      trim: true,
+      required: [true, 'Please add a first name'],
+      trim: true
     },
     lastName: {
       type: String,
-      required: [true, 'Please provide a last name'],
-      trim: true,
+      required: [true, 'Please add a last name'],
+      trim: true
     },
-    role: {
+    email: {
       type: String,
-      enum: ['admin', 'coach', 'parent', 'player'],
-      default: 'player',
+      required: [true, 'Please add an email'],
+      unique: true,
+      match: [
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        'Please add a valid email'
+      ],
+      lowercase: true,
+      trim: true
+    },
+    password: {
+      type: String,
+      required: [true, 'Please add a password'],
+      minlength: 6,
+      select: false
     },
     profileImage: {
       type: String,
-      default: '',
+      default: '/default-avatar.svg'
     },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    phoneNumber: {
+    role: {
       type: String,
-      default: '',
+      enum: ['user', 'admin'],
+      default: 'user'
     },
-    resetPasswordToken: String,
-    resetPasswordExpire: Date,
-    lastLogin: Date,
+    pushToken: {
+      type: String,
+      default: ''
+    },
     preferences: {
       emailNotifications: {
         type: Boolean,
-        default: true,
+        default: true
       },
       pushNotifications: {
         type: Boolean,
-        default: true,
+        default: true
       },
       theme: {
         type: String,
         enum: ['light', 'dark', 'system'],
-        default: 'system',
+        default: 'system'
       }
-    }
+    },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date
   },
   {
-    timestamps: true,
+    timestamps: true
   }
 );
 
-// Encrypt password using bcrypt
-UserSchema.pre('save', async function (next) {
+// Hash password before saving
+UserSchema.pre('save', async function(next) {
+  // Only hash the password if it has been modified (or is new)
   if (!this.isModified('password')) {
-    next();
+    return next();
   }
 
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
+  try {
+    // Generate salt
+    const salt = await bcrypt.genSalt(10);
+    // Hash password with salt
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
-// Sign JWT and return
-UserSchema.methods.getSignedJwtToken = function () {
-  return jwt.sign(
-    { id: this._id, role: this.role },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    }
-  );
-};
-
-// Match user entered password to hashed password in database
-UserSchema.methods.matchPassword = async function (enteredPassword) {
+// Method to compare passwords
+UserSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Generate and hash password token
-UserSchema.methods.getResetPasswordToken = function () {
+// Create password reset token
+UserSchema.methods.getResetPasswordToken = function() {
   // Generate token
   const resetToken = crypto.randomBytes(20).toString('hex');
 
@@ -109,8 +102,8 @@ UserSchema.methods.getResetPasswordToken = function () {
     .update(resetToken)
     .digest('hex');
 
-  // Set expire
-  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+  // Set expire time (10 minutes)
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
 
   return resetToken;
 };

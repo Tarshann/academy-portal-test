@@ -55,7 +55,9 @@ app.get('/health', (req, res) => {
 
 // API routes
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/groups', require('./routes/groups'));
+app.use('/api/users', require('./routes/api/users'));
+app.use('/api/groups', require('./routes/api/groups'));
+app.use('/api/uploads', require('./routes/api/uploads'));
 app.use('/api/messages', require('./routes/messages'));
 app.use('/api/notifications', require('./routes/notifications'));
 
