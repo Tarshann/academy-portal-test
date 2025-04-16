@@ -12,6 +12,7 @@ import ResetPassword from './pages/ResetPassword';
 import Home from './pages/Home';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CssBaseline, Box, CircularProgress, Typography } from '@mui/material';
+import websocket from './shared/websocket';
 
 // // Simple Authentication check (replace with real auth context later)
 // const useAuth = () => {
