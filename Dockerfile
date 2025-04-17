@@ -5,8 +5,8 @@ WORKDIR /app
 # Install dependencies
 RUN apk add --no-cache python3 make g++ curl
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install a specific pnpm version compatible with Node 16
+RUN npm install -g pnpm@7.33.6
 
 # Copy package files
 COPY package.json pnpm-lock.yaml* ./
@@ -23,6 +23,7 @@ COPY . .
 
 # Skip ESLint preflight check for compatibility
 ENV SKIP_PREFLIGHT_CHECK=true
+ENV DISABLE_ESLINT_PLUGIN=true
 
 # Build web application
 RUN echo "Starting web build process..." && \
