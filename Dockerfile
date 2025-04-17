@@ -1,5 +1,5 @@
 # Base stage for Node.js Alpine
-FROM node:20-alpine AS base
+FROM node:20-alpine3.18 AS base
 WORKDIR /app
 
 # Install Python, Make, G++, and Curl needed for some native addons and health checks
@@ -35,10 +35,12 @@ ENV NODE_ENV=production
 COPY . .
 
 # Run the web build command
-RUN echo "Starting web build process..." && \
+RUN chmod +x ./packages/web/node_modules/.bin/react-scripts && \
+    echo "Starting web build process..." && \
     npm run build --prefix packages/web && \
     echo "Web build completed." && \
-    ls -l /app/packages/web/ # Verify build directory creation
+    ls -l /app/packages/web/
+# Verify build directory creation
 
 # --- Production Stage --- 
 # Create the final lean image
