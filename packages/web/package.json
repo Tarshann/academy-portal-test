@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "vite",
-    "build": "vite build",
+    "build": "cross-env CI=false GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test"
   },
   "dependencies": {
