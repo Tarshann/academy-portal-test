@@ -35,13 +35,12 @@ ENV NODE_ENV=production
 COPY . .
 
 # Run the web build command
-RUN chmod +x ./packages/web/node_modules/.bin/react-scripts && \
-    chmod +x ./packages/web/node_modules/.bin/cross-env && \
+# Ensure cross-env and react-scripts have executable permission
+RUN chmod +x ./packages/web/node_modules/.bin/cross-env && \
+    chmod +x ./packages/web/node_modules/.bin/react-scripts && \
     echo "Starting web build process..." && \
     npm run build --prefix packages/web && \
-    echo "Web build completed." && \
-    ls -l /app/packages/web/
-# Verify build directory creation
+    echo "Web build completed."
 
 # --- Production Stage --- 
 # Create the final lean image
