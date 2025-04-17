@@ -79,8 +79,8 @@ RUN addgroup -g 1001 nodejs && \
 USER nodejs
 
 # Use the PORT environment variable provided by Heroku
-ENV PORT $PORT
-EXPOSE $PORT
+ENV PORT=8080
+EXPOSE ${PORT}
 
 # Start the server
 CMD ["npm", "run", "start"] 
