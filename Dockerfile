@@ -26,6 +26,7 @@ RUN pnpm install --no-frozen-lockfile
 FROM dependencies AS builder
 WORKDIR /app
 ENV NODE_ENV=production
+ENV NODE_OPTIONS=--openssl-legacy-provider
 
 COPY . .
 
@@ -37,6 +38,7 @@ RUN echo "Starting web build process..." && \
 FROM node:20-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
+ENV NODE_OPTIONS=--openssl-legacy-provider
 
 RUN apk add --no-cache curl
 
