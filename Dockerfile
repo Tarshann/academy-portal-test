@@ -20,7 +20,7 @@ COPY packages/server/package.json packages/server/pnpm-lock.yaml* ./packages/ser
 COPY packages/web/package.json packages/web/pnpm-lock.yaml* ./packages/web/
 
 # Install all deps using pnpm
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # --- Builder Stage --- 
 FROM dependencies AS builder
