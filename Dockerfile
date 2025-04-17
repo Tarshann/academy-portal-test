@@ -36,6 +36,7 @@ COPY . .
 
 # Run the web build command
 RUN chmod +x ./packages/web/node_modules/.bin/react-scripts && \
+    chmod +x ./packages/web/node_modules/.bin/cross-env && \
     echo "Starting web build process..." && \
     npm run build --prefix packages/web && \
     echo "Web build completed." && \
