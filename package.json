@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@react-native-community/netinfo": "^11.4.1",
+    "cross-env": "^7.0.3",
     "date-fns": "^4.1.0",
     "expo-document-picker": "^13.0.3",
     "expo-image-picker": "^16.0.6",
