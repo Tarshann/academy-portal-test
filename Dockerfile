@@ -15,13 +15,14 @@ COPY packages/components/package.json ./packages/components/
 COPY packages/server/package.json ./packages/server/
 COPY packages/web/package.json ./packages/web/
 
-# Install dependencies
+# Install dependencies with compatible ESLint
 RUN pnpm install --no-frozen-lockfile
+RUN npm install --save-dev eslint@6.8.0
 
 # Copy all source files
 COPY . .
 
-# Skip ESLint preflight check for compatibility
+# Set environment variables for compatibility
 ENV SKIP_PREFLIGHT_CHECK=true
 ENV DISABLE_ESLINT_PLUGIN=true
 
