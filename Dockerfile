@@ -1,4 +1,4 @@
-# Base stage for Node.js Alpine
+﻿# Base stage for Node.js Alpine
 FROM node:20-alpine3.18 AS base
 WORKDIR /app
 
@@ -6,82 +6,56 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++ curl
 
 # --- Dependencies Stage --- 
-# Install ALL dependencies needed for building and running
 FROM base AS dependencies
 WORKDIR /app
 
-# Copy all package.json AND lock files first for cache efficiency
-COPY package.json package-lock.json* ./
-COPY packages/common/package.json packages/common/package-lock.json* ./packages/common/
-COPY packages/components/package.json packages/components/package-lock.json* ./packages/components/
-COPY packages/server/package.json packages/server/package-lock.json* ./packages/server/
-COPY packages/web/package.json packages/web/package-lock.json* ./packages/web/
+# Install pnpm globally
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Install all dependencies using ci for faster, reliable installs
-# Fallback to install if no lock file is present
-RUN npm ci || npm install
-RUN cd packages/common && (npm ci || npm install)
-RUN cd packages/components && (npm ci || npm install)
-RUN cd packages/server && (npm ci || npm install)
-RUN cd packages/web && (npm ci || npm install)
+# Copy all package.json AND lock files first for cache efficiency
+COPY package.json pnpm-lock.yaml* ./ 
+COPY packages/common/package.json packages/common/pnpm-lock.yaml* ./packages/common/
+COPY packages/components/package.json packages/components/pnpm-lock.yaml* ./packages/components/
+COPY packages/server/package.json packages/server/pnpm-lock.yaml* ./packages/server/
+COPY packages/web/package.json packages/web/pnpm-lock.yaml* ./packages/web/
+
+# Install all deps using pnpm
+RUN pnpm install --frozen-lockfile
 
 # --- Builder Stage --- 
-# Build the frontend application
 FROM dependencies AS builder
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Copy the entire source code 
 COPY . .
 
-# Run the web build command
-RUN chmod +x ./packages/web/node_modules/.bin/cross-env && \
-    chmod +x ./packages/web/node_modules/.bin/react-scripts && \
-    echo "Starting web build process..." && \
-    npm run build --prefix packages/web && \
+RUN echo "Starting web build process..." && \
+    pnpm --filter "@academy-portal/web" build && \
     echo "Web build completed."
 
-# Verify build directory creation
-
-# --- Production Stage --- 
-# Create the final lean image
+# --- Production Stage ---
 FROM node:20-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Install curl for health checks
 RUN apk add --no-cache curl
 
-# Copy necessary package.json files from the builder stage
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/packages/common/package*.json ./packages/common/
-COPY --from=builder /app/packages/server/package*.json ./packages/server/
-
-# Install ONLY production dependencies for server and common
-# Using ci if lock file exists, otherwise install
-RUN cd packages/server && (npm ci --only=production || npm install --only=production)
-RUN cd packages/common && (npm ci --only=production || npm install --only=production)
-
-# Copy server and common source code (excluding node_modules)
-COPY --from=builder /app/packages/server /app/packages/server
+COPY --from=builder /app/package.json ./ 
 COPY --from=builder /app/packages/common /app/packages/common
-
-# Copy the BUILT web application from the builder stage
+COPY --from=builder /app/packages/server /app/packages/server
 COPY --from=builder /app/packages/web/build /app/packages/web/build
 
-# *** ADDED DEBUGGING: List contents of copied build directory ***
-RUN echo "Listing final contents of /app/packages/web/build:" && ls -la /app/packages/web/build
+# Install production dependencies
+RUN corepack enable && corepack prepare pnpm@latest --activate && \
+    pnpm --filter "@academy-portal/server" install --prod && \
+    pnpm --filter "@academy-portal/common" install --prod
 
-# Create and set ownership for a non-root user
+# Create non-root user
 RUN addgroup -g 1001 nodejs && \
     adduser -S -u 1001 -G nodejs nodejs && \
     chown -R nodejs:nodejs /app
-
 USER nodejs
 
-# Use the PORT environment variable provided by Heroku
 ENV PORT=8080
 EXPOSE ${PORT}
-
-# Start the server
-CMD ["npm", "run", "start"] 
+CMD ["pnpm", "--filter", "@academy-portal/server", "start"]
