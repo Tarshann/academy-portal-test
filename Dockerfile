@@ -1,4 +1,4 @@
-﻿# Base stage for Node.js Alpine
+# Base stage for Node.js Alpine
 FROM node:20-alpine3.18 AS base
 WORKDIR /app
 
@@ -10,7 +10,7 @@ FROM base AS dependencies
 WORKDIR /app
 
 # Install pnpm globally
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN npm install -g pnpm
 
 # Copy all package.json AND lock files first for cache efficiency
 COPY package.json pnpm-lock.yaml* ./ 
@@ -46,7 +46,7 @@ COPY --from=builder /app/packages/server /app/packages/server
 COPY --from=builder /app/packages/web/build /app/packages/web/build
 
 # Install production dependencies
-RUN corepack enable && corepack prepare pnpm@latest --activate && \
+RUN npm install -g pnpm && \
     pnpm --filter "@academy-portal/server" install --prod && \
     pnpm --filter "@academy-portal/common" install --prod
 
