@@ -8,7 +8,7 @@ FROM base AS dependencies
 WORKDIR /app
 
 # Install pnpm
-RUN npm install -g pnpm
+RUN npm install -g pnpm@7.33.6
 
 # Copy package definitions
 COPY package.json pnpm-lock.yaml* ./
