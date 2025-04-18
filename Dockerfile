@@ -21,10 +21,20 @@ RUN pnpm install --no-frozen-lockfile
 # Copy all source files
 COPY . .
 
+<<<<<<< HEAD
 # Skip the web build completely
 RUN echo "Skipping web build process..."
 RUN mkdir -p /app/packages/web/build
 RUN echo '<html><body>Placeholder build</body></html>' > /app/packages/web/build/index.html
+=======
+# Run the web build command
+# Ensure cross-env and react-scripts have executable permission
+RUN chmod +x ./packages/web/node_modules/.bin/cross-env && \
+    chmod +x ./packages/web/node_modules/.bin/react-scripts && \
+    echo "Starting web build process..." && \
+    npm run build --prefix packages/web && \
+    echo "Web build completed."
+>>>>>>> 8f8d6c43fdd2d27e270d7877b2fd2cb83ab2b1c7
 
 # Set up server
 WORKDIR /app/packages/server
