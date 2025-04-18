@@ -1,5 +1,5 @@
 ﻿# Base image
-FROM node:20-alpine3.18 AS base
+FROM node:16-alpine3.18 AS base
 WORKDIR /app
 RUN apk add --no-cache python3 make g++ curl
 
@@ -30,7 +30,7 @@ COPY . .
 RUN pnpm --filter "@academy-portal/web" build
 
 # --- Production Stage ---
-FROM node:20-alpine3.18 AS production
+FROM node:16-alpine3.18 AS production
 WORKDIR /app
 ENV NODE_ENV=production
 
