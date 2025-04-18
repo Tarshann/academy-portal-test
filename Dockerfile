@@ -1,43 +1,57 @@
-﻿FROM node:16-alpine
-
+﻿# Base image
+FROM node:20-alpine3.18 AS base
 WORKDIR /app
-
-# Install dependencies
 RUN apk add --no-cache python3 make g++ curl
 
+# --- Dependencies Stage ---
+FROM base AS dependencies
+WORKDIR /app
+
 # Install pnpm
-RUN npm install -g pnpm@7.33.6
+RUN npm install -g pnpm
 
-# Copy package files
+# Copy package definitions
 COPY package.json pnpm-lock.yaml* ./
-COPY packages/common/package.json ./packages/common/
-COPY packages/components/package.json ./packages/components/
-COPY packages/server/package.json ./packages/server/
-COPY packages/web/package.json ./packages/web/
+COPY packages/common/package.json packages/common/pnpm-lock.yaml* ./packages/common/
+COPY packages/components/package.json packages/components/pnpm-lock.yaml* ./packages/components/
+COPY packages/server/package.json packages/server/pnpm-lock.yaml* ./packages/server/
+COPY packages/web/package.json packages/web/pnpm-lock.yaml* ./packages/web/
 
-# Install dependencies
+# Install all dependencies
 RUN pnpm install --no-frozen-lockfile
 
-# Copy all source files
+# --- Builder Stage ---
+FROM dependencies AS builder
+WORKDIR /app
+ENV NODE_ENV=production
 COPY . .
 
-<<<<<<< HEAD
-# Skip the web build completely
-RUN echo "Skipping web build process..."
-RUN mkdir -p /app/packages/web/build
-RUN echo '<html><body>Placeholder build</body></html>' > /app/packages/web/build/index.html
-=======
-# Run the web build command
-# Ensure cross-env and react-scripts have executable permission
-RUN chmod +x ./packages/web/node_modules/.bin/cross-env && \
-    chmod +x ./packages/web/node_modules/.bin/react-scripts && \
-    echo "Starting web build process..." && \
-    npm run build --prefix packages/web && \
-    echo "Web build completed."
->>>>>>> 8f8d6c43fdd2d27e270d7877b2fd2cb83ab2b1c7
+# Build the web app
+RUN pnpm --filter "@academy-portal/web" build
 
-# Set up server
-WORKDIR /app/packages/server
+# --- Production Stage ---
+FROM node:20-alpine3.18 AS production
+WORKDIR /app
+ENV NODE_ENV=production
 
-# Start server
-CMD ["pnpm", "start"]
+# Reinstall pnpm
+RUN npm install -g pnpm
+
+# Copy production files
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/packages/common /app/packages/common
+COPY --from=builder /app/packages/server /app/packages/server
+COPY --from=builder /app/packages/web/build /app/packages/web/build
+
+# Install production-only deps
+RUN pnpm --filter "@academy-portal/common" install --prod && \
+    pnpm --filter "@academy-portal/server" install --prod
+
+# Set up non-root user
+RUN addgroup -g 1001 nodejs && \
+    adduser -S -u 1001 -G nodejs nodejs && \
+    chown -R nodejs:nodejs /app
+USER nodejs
+
+EXPOSE 8080
+CMD ["pnpm", "--filter", "@academy-portal/server", "start"]
