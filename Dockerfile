@@ -1,4 +1,4 @@
-﻿# Base image
+ ﻿# Base image
 FROM node:16-alpine3.18 AS base
 WORKDIR /app
 RUN apk add --no-cache python3 make g++ curl
@@ -27,7 +27,7 @@ ENV NODE_ENV=production
 COPY . .
 
 # Build the web app
-RUN pnpm --filter "@academy-portal/web" build
+RUN NODE_OPTIONS=--openssl-legacy-provider pnpm --filter "@academy-portal/web" build
 
 # --- Production Stage ---
 FROM node:16-alpine3.18 AS production
