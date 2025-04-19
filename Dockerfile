@@ -27,8 +27,8 @@ ENV NODE_ENV=production
 COPY . .
 
 # Build the web app
-RUN pnpm --filter "@academy-portal/web" build
 ENV NODE_OPTIONS=--openssl-legacy-provider
+RUN pnpm --filter "@academy-portal/web" build
 
 # --- Production Stage ---
 FROM node:16-alpine3.18 AS production
