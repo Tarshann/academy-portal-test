@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "vite",
-    "build": "cross-env CI=false DISABLE_ESLINT_PLUGIN=true SKIP_PREFLIGHT_CHECK=true GENERATE_SOURCEMAP=false react-scripts build",
+    "build": "cross-env CI=false DISABLE_ESLINT_PLUGIN=true SKIP_PREFLIGHT_CHECK=true GENERATE_SOURCEMAP=false react-scripts build --verbose",
     "test": "react-scripts test"
   },
   "dependencies": {
