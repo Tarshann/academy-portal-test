@@ -1,4 +1,3 @@
- ﻿# Base image
 FROM node:16-alpine3.18 AS base
 WORKDIR /app
 RUN apk add --no-cache python3 make g++ curl
