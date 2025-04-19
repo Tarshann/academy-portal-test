@@ -28,7 +28,6 @@ COPY . .
 
 # Build the web app
 RUN NODE_OPTIONS=--openssl-legacy-provider pnpm --filter "@academy-portal/web" build
-RUN pnpm --filter "@academy-portal/web" build
 
 # --- Production Stage ---
 FROM node:16-alpine3.18 AS production
