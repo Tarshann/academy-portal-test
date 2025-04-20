@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: academy-portal-web
+    env: docker
+    plan: free # or 'starter' for more resources
+    branch: main
+    repo: https://github.com/Tarshann/academy-portal-test
+    dockerfilePath: ./Dockerfile
+    buildFilter:
+      paths:
+        - packages/web/**
+    autoDeploy: true
+
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+
+databases:
+  - name: academy-db
+    databaseName: academy
+    user: academy_user
+    plan: free # or 'starter'
+    postgresMajorVersion: 15
