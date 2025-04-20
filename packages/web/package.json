@@ -4,10 +4,10 @@
   "description": "Web-specific code",
   "main": "index.js",
   "scripts": {
-    "start": "vite",
-    "build": "cross-env CI=false DISABLE_ESLINT_PLUGIN=true SKIP_PREFLIGHT_CHECK=true GENERATE_SOURCEMAP=false react-scripts build --verbose",
-    "test": "react-scripts test"
-  },
+  "start": "vite",
+  "build": "cross-env CI=false NODE_OPTIONS=--openssl-legacy-provider DISABLE_ESLINT_PLUGIN=true SKIP_PREFLIGHT_CHECK=true GENERATE_SOURCEMAP=false react-scripts build",
+  "test": "react-scripts test"
+},
   "dependencies": {
     "@academy-portal/common": "file:../common",
     "@academy-portal/components": "file:../components",
