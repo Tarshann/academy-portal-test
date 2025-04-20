@@ -1,5 +1,5 @@
 # Base image
-FROM node:16-alpine AS base
+FROM node:20-alpine AS base
 LABEL maintainer="Tarshann"
 LABEL description="Academy Portal Application"
 
@@ -12,16 +12,16 @@ RUN apk add --no-cache python3 make g++ curl && \
 
 # Dependencies Stage
 FROM base AS dependencies
-
+WORKDIR /app
 # Copy package files
-COPY package.json ./
+COPY package.json pnpm-lock.yaml ./
 COPY packages/common/package.json ./packages/common/
 COPY packages/components/package.json ./packages/components/
 COPY packages/server/package.json ./packages/server/
 COPY packages/web/package.json ./packages/web/
 
 # Install dependencies
-RUN npm ci
+RUN npm install -g pnpm && pnpm install
 
 # Builder Stage
 FROM dependencies AS builder
@@ -31,7 +31,7 @@ COPY . .
 RUN cd packages/web && DISABLE_ESLINT_PLUGIN=true npm run build
 
 # Production Stage
-FROM node:16-alpine AS production
+FROM node:20-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
 
