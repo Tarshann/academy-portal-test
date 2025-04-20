@@ -7,17 +7,17 @@
     "pnpm": ">=8.0.0"
   },
   "scripts": {
-    "start": "pnpm --filter \"@academy-portal/server\" start:server",
-    "start:web": "pnpm --filter \"@academy-portal/web\" start",
-    "start:mobile": "pnpm --filter \"@academy-portal/mobile\" start",
-    "start:server": "pnpm --filter \"@academy-portal/server\" start:server",
-    "build:web": "echo 'Building web package...' && pnpm --filter \"@academy-portal/web\" build && echo 'Web build complete' && ls -la packages/web/build",
-    "build:server": "echo 'Server is ready to run'",
-    "build:mobile": "pnpm --filter \"@academy-portal/mobile\" build",
-    "test": "pnpm --filter \"@academy-portal/server\" test",
-    "deploy": "node scripts/deploy.js",
-    "heroku-postbuild": "pnpm install --no-frozen-lockfile && pnpm --filter \"@academy-portal/web\" build"
-  },
+  "start": "node packages/server/server.js",
+  "start:web": "cd packages/web && npm start",
+  "start:mobile": "cd packages/mobile && npm start",
+  "start:server": "cd packages/server && npm start",
+  "build:web": "cd packages/web && npm run build",
+  "build:server": "echo 'Server is ready to run'",
+  "build:mobile": "cd packages/mobile && npm run build",
+  "test": "cd packages/server && npm test",
+  "deploy": "node scripts/deploy.js",
+  "heroku-postbuild": "npm run build:web"
+},
   "devDependencies": {
     "eslint": "^8.45.0",
     "jest": "^29.6.0",
