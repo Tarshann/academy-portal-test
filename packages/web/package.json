@@ -12,7 +12,6 @@
     "@academy-portal/common": "file:../common",
     "@academy-portal/components": "file:../components",
     "eslint": "7.32.0",
-    "eslint-webpack-plugin": "^2.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1"
