@@ -12,9 +12,9 @@ RUN apk add --no-cache python3 make g++ curl && \
 
 # Dependencies Stage
 FROM base AS dependencies
-
+WORKDIR /app
 # Copy package files
-COPY package.json ./
+COPY package.json pnpm-lock.yaml ./
 COPY packages/common/package.json ./packages/common/
 COPY packages/components/package.json ./packages/components/
 COPY packages/server/package.json ./packages/server/
