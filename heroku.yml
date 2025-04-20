@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: pnpm --filter "@academy-portal/server" start:server
+  web: npm start
