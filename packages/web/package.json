@@ -4,11 +4,12 @@
   "description": "Web-specific code",
   "main": "index.js",
   "scripts": {
-  "start": "vite",
+  "start": "react-scripts start",
   "build": "cross-env CI=false NODE_OPTIONS=--openssl-legacy-provider DISABLE_ESLINT_PLUGIN=true SKIP_PREFLIGHT_CHECK=true GENERATE_SOURCEMAP=false react-scripts build",
   "test": "react-scripts test"
 },
-  "dependencies": {
+
+"dependencies": {
     "@academy-portal/common": "file:../common",
     "@academy-portal/components": "file:../components",
     "eslint": "7.32.0",
