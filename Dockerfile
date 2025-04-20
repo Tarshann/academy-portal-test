@@ -21,7 +21,7 @@ COPY packages/server/package.json ./packages/server/
 COPY packages/web/package.json ./packages/web/
 
 # Install dependencies
-RUN npm ci
+RUN npm install -g pnpm && pnpm install
 
 # Builder Stage
 FROM dependencies AS builder
