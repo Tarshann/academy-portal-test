@@ -8,14 +8,14 @@ FROM base AS dependencies
 WORKDIR /app
 # Install pnpm
 RUN npm install -g pnpm@7.33.6
-# Copy package definitions and npmrc
+# Copy package definitions
 COPY package.json pnpm-lock.yaml* ./
 COPY packages/common/package.json ./packages/common/
 COPY packages/components/package.json ./packages/components/
 COPY packages/server/package.json ./packages/server/
 COPY packages/web/package.json ./packages/web/
-# Install all dependencies with legacy peer deps
-RUN pnpm install --no-frozen-lockfile --legacy-peer-deps
+# Install all dependencies (without legacy-peer-deps flag)
+RUN pnpm install --no-frozen-lockfile
 
 # --- Builder Stage ---
 FROM dependencies AS builder
@@ -38,7 +38,7 @@ COPY --from=builder /app/packages/common /app/packages/common
 COPY --from=builder /app/packages/server /app/packages/server
 COPY --from=builder /app/packages/web/build /app/packages/web/build
 # Install production-only deps
-RUN pnpm install --prod --legacy-peer-deps
+RUN pnpm install --prod
 # Set up non-root user
 RUN addgroup -g 1001 nodejs && \
     adduser -S -u 1001 -G nodejs nodejs && \
