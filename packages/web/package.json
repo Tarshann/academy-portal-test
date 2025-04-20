@@ -11,8 +11,7 @@
   "dependencies": {
     "@academy-portal/common": "file:../common",
     "@academy-portal/components": "file:../components",
-    "eslint": "8.57.0",
-    "eslint-webpack-plugin": "3.3.0",
+    "eslint": "7.32.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1"
@@ -32,7 +31,6 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.4.0",
     "cross-env": "^7.0.3",
-    "vite": "^6.3.1",
-    "react-scripts": "^5.0.1"
+    "vite": "^6.3.1"
   }
 }
