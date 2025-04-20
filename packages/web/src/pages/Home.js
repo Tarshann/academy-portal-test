@@ -16,7 +16,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import ConversationList from '../components/Chat/ConversationList';
 import ChatWindow from '../components/Chat/ChatWindow';
-import { websocketService } from '../../../common/services/websocket';
+import { websocketService } from './shared/websocket';
 import api from '../services/api';
 
 // Basic theme for the home page
