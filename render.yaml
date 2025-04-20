@@ -9,6 +9,8 @@ services:
     buildFilter:
       paths:
         - packages/web/**
+        - packages/server/**
+        - packages/common/**
     autoDeploy: true
 
     envVars:
