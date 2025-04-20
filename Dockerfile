@@ -6,7 +6,6 @@ RUN apk add --no-cache python3 make g++ curl
 # --- Dependencies Stage ---
 FROM base AS dependencies
 WORKDIR /app
-# Install npm instead of pnpm
 # Copy package definitions
 COPY package.json ./
 COPY packages/common/package.json ./packages/common/
