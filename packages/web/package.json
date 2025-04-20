@@ -4,18 +4,17 @@
   "description": "Web-specific code",
   "main": "index.js",
   "scripts": {
-  "start": "react-scripts start",
-  "build": "cross-env CI=false NODE_OPTIONS=--openssl-legacy-provider DISABLE_ESLINT_PLUGIN=true SKIP_PREFLIGHT_CHECK=true GENERATE_SOURCEMAP=false react-scripts build",
-  "test": "react-scripts test"
-},
-
-"dependencies": {
+    "start": "react-scripts start",
+    "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
+    "test": "react-scripts test"
+  },
+  "dependencies": {
     "@academy-portal/common": "file:../common",
     "@academy-portal/components": "file:../components",
     "eslint": "7.32.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1"
+    "react-scripts": "^5.0.1"
   },
   "browserslist": {
     "production": [
