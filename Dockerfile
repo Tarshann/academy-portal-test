@@ -1,51 +1,35 @@
 # Base image
-FROM node:16-alpine AS base
-LABEL maintainer="Tarshann"
-LABEL description="Academy Portal Application"
-
+FROM node:20-alpine AS base
 WORKDIR /app
+RUN apk add --no-cache python3 make g++ curl
+RUN npm install -g pnpm
 
-# Install necessary tools
-RUN apk add --no-cache python3 make g++ curl && \
-    addgroup -g 1001 nodejs && \
-    adduser -S -u 1001 -G nodejs nodejs
-
-# Dependencies Stage
+# --- Dependencies Stage ---
 FROM base AS dependencies
-
-# Copy package files
-COPY package.json ./
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./  # Include lock file!
 COPY packages/common/package.json ./packages/common/
 COPY packages/components/package.json ./packages/components/
 COPY packages/server/package.json ./packages/server/
 COPY packages/web/package.json ./packages/web/
+RUN pnpm install
 
-# Install dependencies
-RUN npm ci
-
-# Builder Stage
+# --- Builder Stage ---
 FROM dependencies AS builder
-ENV NODE_ENV=production
-
-COPY . .
-RUN cd packages/web && DISABLE_ESLINT_PLUGIN=true npm run build
-
-# Production Stage
-FROM node:16-alpine AS production
 WORKDIR /app
+COPY . .
 ENV NODE_ENV=production
+RUN pnpm --filter @academy-portal/web build
 
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/packages/common /app/packages/common
-COPY --from=builder /app/packages/server /app/packages/server
-COPY --from=builder /app/packages/web/build /app/packages/web/build
-
-RUN npm ci --only=production
+# --- Production Stage ---
+FROM node:20-alpine AS production
+WORKDIR /app
+RUN npm install -g pnpm
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/packages /app/packages
+COPY --from=builder /app/packages/web/build ./packages/web/build
+RUN pnpm install --prod
+RUN addgroup -g 1001 nodejs && adduser -S -u 1001 -G nodejs nodejs && chown -R nodejs:nodejs /app
 USER nodejs
-
-EXPOSE 8080
+EXPOSE 10000
 CMD ["node", "packages/server/server.js"]
-
-# Optional Healthcheck
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8080/health || exit 1
