@@ -87,25 +87,5 @@ function AppRoutes() {
   );
 }
 
-// Wrapper for private routes
-function PrivateRoute({ children, isAuthenticated, ...rest }) {
-  return (
-    <Route
-      {...rest}
-      render={({ location }) =>
-        isAuthenticated ? (
-          children
-        ) : (
-          <Navigate
-            to={{
-              pathname: "/login",
-              state: { from: location }
-            }}
-          />
-        )
-      }
-    />
-  );
-}
 
 export default App; 
