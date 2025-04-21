@@ -28,7 +28,7 @@ FROM dependencies AS builder
 ENV NODE_ENV=production
 
 COPY . .
-RUN cd packages/web && DISABLE_ESLINT_PLUGIN=true npm run build
+RUN cd packages/web && npm run build
 
 # Production Stage
 FROM node:20-alpine AS production
