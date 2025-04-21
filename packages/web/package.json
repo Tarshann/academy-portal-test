@@ -1,20 +1,21 @@
 {
   "name": "@academy-portal/web",
   "version": "1.0.0",
-  "description": "Web-specific code",
-  "main": "index.js",
+  "private": true,
+  "description": "Academy Portal frontend",
   "scripts": {
     "start": "react-scripts start",
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider DISABLE_ESLINT_PLUGIN=true react-scripts build",
-    "test": "react-scripts test"
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "dependencies": {
     "@academy-portal/common": "file:../common",
     "@academy-portal/components": "file:../components",
+    "cross-env": "^7.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "cross-env": "^7.0.3",
     "socket.io-client": "^4.8.1",
     "date-fns": "^4.1.0",
     "lodash": "^4.17.21",
