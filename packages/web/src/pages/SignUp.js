@@ -16,7 +16,7 @@ import {
   Alert,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api'; // Use the API service
 
 const theme = createTheme({
@@ -60,7 +60,7 @@ const SignUp = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(''); // For success message
   const [loading, setLoading] = useState(false);
-  const history = useHistory();
+  const [navigate] = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -83,7 +83,7 @@ const SignUp = () => {
       });
       setSuccess('Registration successful! Navigate to login...');
       setTimeout(() => {
-        history.push('/login');
+        navigate('/login');
       }, 2000); // Navigate after 2 seconds
     } catch (err) {
       const message = err.response?.data?.message || 'Registration failed. Please try again.';
