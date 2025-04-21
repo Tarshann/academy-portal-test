@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useAuth } from '../context/AuthContext';
-import { useHistory, Link as RouterLink } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 
 const theme = createTheme({
   palette: {
@@ -57,7 +57,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -68,7 +68,7 @@ const Login = () => {
 
     setLoading(false);
     if (result.success) {
-      history.push('/');
+      navigate('/login');
     } else {
       setError(result.message || 'Login failed. Please try again.');
     }
