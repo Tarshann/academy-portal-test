@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Route,
-  Switch,
+  Routes,
   Redirect,
 } from 'react-router-dom';
 import Login from './pages/Login';
@@ -75,7 +75,7 @@ function AppRoutes() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Switch>
+      <Routes>
         <Route path="/login">
           {isAuthenticated ? <Redirect to="/" /> : <Login />}
         </Route>
@@ -94,7 +94,7 @@ function AppRoutes() {
         {/* Add other private/public routes here */}
         
         <Redirect from="*" to={isAuthenticated ? "/" : "/login"} />
-      </Switch>
+      </Routes>
     </Box>
   );
 }
