@@ -3,7 +3,7 @@ import {
   BrowserRouter as Router,
   Route,
   Routes,
-  Redirect,
+  Navigate,
 } from 'react-router-dom';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
@@ -77,23 +77,23 @@ function AppRoutes() {
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Routes>
         <Route path="/login">
-          {isAuthenticated ? <Redirect to="/" /> : <Login />}
+          {isAuthenticated ? <Navigate to="/" /> : <Login />}
         </Route>
         <Route path="/signup">
-          {isAuthenticated ? <Redirect to="/" /> : <SignUp />}
+          {isAuthenticated ? <Navigate to="/" /> : <SignUp />}
         </Route>
         <Route path="/forgot-password">
-          {isAuthenticated ? <Redirect to="/" /> : <ForgotPassword />}
+          {isAuthenticated ? <Navigate to="/" /> : <ForgotPassword />}
         </Route>
         <Route path="/reset-password/:resetToken">
-          {isAuthenticated ? <Redirect to="/" /> : <ResetPassword />}
+          {isAuthenticated ? <Navigate to="/" /> : <ResetPassword />}
         </Route>
         <PrivateRoute exact path="/" isAuthenticated={isAuthenticated}>
           <Home />
         </PrivateRoute>
         {/* Add other private/public routes here */}
         
-        <Redirect from="*" to={isAuthenticated ? "/" : "/login"} />
+        <Navigate from="*" to={isAuthenticated ? "/" : "/login"} />
       </Routes>
     </Box>
   );
@@ -108,7 +108,7 @@ function PrivateRoute({ children, isAuthenticated, ...rest }) {
         isAuthenticated ? (
           children
         ) : (
-          <Redirect
+          <Navigate
             to={{
               pathname: "/login",
               state: { from: location }
