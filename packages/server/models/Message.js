@@ -53,7 +53,7 @@ const MessageSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    editHistory: [
+    editNavigate: [
       {
         content: String,
         editedAt: {
@@ -101,8 +101,8 @@ MessageSchema.methods.markAsRead = async function (userId) {
 
 // Edit message
 MessageSchema.methods.editContent = async function (newContent) {
-  // Save previous content to history
-  this.editHistory.push({
+  // Save previous content to navigate
+  this.editNavigate.push({
     content: this.content,
     editedAt: Date.now(),
   });
