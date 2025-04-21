@@ -15,7 +15,7 @@ import {
   Alert,
 } from '@mui/material';
 import LockResetIcon from '@mui/icons-material/LockReset';
-import { Link as RouterLink, useParams, useHistory } from 'react-router-dom';
+import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 const theme = createTheme({
@@ -57,7 +57,7 @@ const ResetPassword = () => {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const { resetToken } = useParams(); // Get token from URL parameter
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
       // Basic check if token exists
