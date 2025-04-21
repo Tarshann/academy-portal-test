@@ -9,7 +9,7 @@ import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import Home from './pages/Home.js';
+import Home from './pages/Home';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CssBaseline, Box, CircularProgress, Typography } from '@mui/material';
 import websocket from './shared/websocket';
