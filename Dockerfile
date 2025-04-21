@@ -21,7 +21,9 @@ COPY packages/server/package.json ./packages/server/
 COPY packages/web/package.json ./packages/web/
 
 # Install dependencies
-RUN npm install -g pnpm@10.9.0 && pnpm install
+RUN npm install -g pnpm@10.9.0 \
+  && pnpm install \
+  && pnpm --filter @academy-portal/web install
 
 # Builder Stage
 FROM dependencies AS builder
