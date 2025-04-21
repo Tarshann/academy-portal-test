@@ -26,12 +26,12 @@ api.interceptors.request.use(
   }
 );
 
-// Optional: Interceptor to handle 401 errors (e.g., redirect to login)
+// Optional: Interceptor to handle 401 errors (e.g., Navigate to login)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Handle unauthorized access - e.g., logout user, redirect to login
+      // Handle unauthorized access - e.g., logout user, Navigate to login
       console.error('Unauthorized access - 401');
       // Example: Trigger logout (needs access to AuthContext or a callback)
       // logout(); 
