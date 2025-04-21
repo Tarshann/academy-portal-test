@@ -81,10 +81,10 @@ const SignUp = () => {
         email,
         password,
       });
-      setSuccess('Registration successful! Redirecting to login...');
+      setSuccess('Registration successful! Navigate to login...');
       setTimeout(() => {
         history.push('/login');
-      }, 2000); // Redirect after 2 seconds
+      }, 2000); // Navigate after 2 seconds
     } catch (err) {
       const message = err.response?.data?.message || 'Registration failed. Please try again.';
       setError(message);
