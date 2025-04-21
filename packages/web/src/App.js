@@ -76,25 +76,13 @@ function AppRoutes() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Routes>
-        <Route path="/login">
-          {isAuthenticated ? <Navigate to="/" /> : <Login />}
-        </Route>
-        <Route path="/signup">
-          {isAuthenticated ? <Navigate to="/" /> : <SignUp />}
-        </Route>
-        <Route path="/forgot-password">
-          {isAuthenticated ? <Navigate to="/" /> : <ForgotPassword />}
-        </Route>
-        <Route path="/reset-password/:resetToken">
-          {isAuthenticated ? <Navigate to="/" /> : <ResetPassword />}
-        </Route>
-        <PrivateRoute exact path="/" isAuthenticated={isAuthenticated}>
-          <Home />
-        </PrivateRoute>
-        {/* Add other private/public routes here */}
-        
-        <Navigate from="*" to={isAuthenticated ? "/" : "/login"} />
-      </Routes>
+  <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <Login />} />
+  <Route path="/signup" element={isAuthenticated ? <Navigate to="/" /> : <SignUp />} />
+  <Route path="/forgot-password" element={isAuthenticated ? <Navigate to="/" /> : <ForgotPassword />} />
+  <Route path="/reset-password/:resetToken" element={isAuthenticated ? <Navigate to="/" /> : <ResetPassword />} />
+  <Route path="/" element={isAuthenticated ? <Home /> : <Navigate to="/login" />} />
+  <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} />} />
+</Routes>
     </Box>
   );
 }
