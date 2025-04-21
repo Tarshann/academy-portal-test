@@ -92,7 +92,7 @@ const ResetPassword = () => {
       setSuccess('Password reset successfully! Navigate to login...');
       // Navigate to login page after a delay
       setTimeout(() => {
-        history.push('/login');
+        navigate('/login');
       }, 3000);
     } catch (err) {
       const message = err.response?.data?.message || 'Failed to reset password. The link may be invalid or expired.';
