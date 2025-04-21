@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import api from '../services/api'; // We will create this service next
-import { websocketService } from '../../../common/services/websocket'; // Adjust path as needed
+import { websocketService } from '../shared/websocket'; // ✅ // Adjust path as needed
 
 const AuthContext = createContext();
 

@@ -8,7 +8,8 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile'; // For attachment button
-import { websocketService } from '../../../../common/services/websocket'; // Adjust path
+import { websocketService } from '../../shared/websocket'; // ✅
+ // Adjust path
 
 const TYPING_TIMER_LENGTH = 1500; // ms
 
