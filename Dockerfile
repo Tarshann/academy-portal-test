@@ -42,7 +42,8 @@ COPY --from=builder /app/packages/common /app/packages/common
 COPY --from=builder /app/packages/server /app/packages/server
 COPY --from=builder /app/packages/web/build /app/packages/web/build
 
-RUN pnpm install --prod
+RUN npm install -g pnpm@10.9.0 \
+  && pnpm install --prod
 USER nodejs
 
 EXPOSE 8080
