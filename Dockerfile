@@ -44,6 +44,7 @@ COPY --from=builder /app/packages/web/build /app/packages/web/build
 
 RUN npm install -g pnpm@10.9.0 \
   && pnpm install --prod
+  
 USER nodejs
 
 EXPOSE 8080
