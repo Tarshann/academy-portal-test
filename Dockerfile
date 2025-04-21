@@ -42,7 +42,7 @@ COPY --from=builder /app/packages/common /app/packages/common
 COPY --from=builder /app/packages/server /app/packages/server
 COPY --from=builder /app/packages/web/build /app/packages/web/build
 
-RUN npm ci --only=production
+RUN pnpm install --prod
 USER nodejs
 
 EXPOSE 8080
