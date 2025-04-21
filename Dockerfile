@@ -1,5 +1,5 @@
 # Base image
-FROM node:16-alpine AS base
+FROM node:20-alpine AS base
 LABEL maintainer="Tarshann"
 LABEL description="Academy Portal Application"
 
@@ -21,7 +21,7 @@ COPY packages/server/package.json ./packages/server/
 COPY packages/web/package.json ./packages/web/
 
 # Install dependencies
-RUN npm install -g pnpm && pnpm install
+RUN npm install -g pnpm@10.9.0 && pnpm install
 
 # Builder Stage
 FROM dependencies AS builder
@@ -31,7 +31,7 @@ COPY . .
 RUN cd packages/web && npm run build
 
 # Production Stage
-FROM node:16-alpine AS production
+FROM node:20-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
 
