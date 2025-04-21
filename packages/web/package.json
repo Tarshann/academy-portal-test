@@ -12,6 +12,8 @@
   "dependencies": {
     "@academy-portal/common": "file:../common",
     "@academy-portal/components": "file:../components",
+    "@mui/icons-material": "^7.0.2",
+    "@mui/material": "^7.0.2",
     "@react-native-community/netinfo": "^11.4.1",
     "ajv": "^8.12.0",
     "ajv-keywords": "^5.1.0",
@@ -23,6 +25,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-native-paper": "^5.6.0",
+    "react-router-dom": "^6.30.0",
     "react-scripts": "5.0.1",
     "socket.io-client": "^4.8.1"
   },
