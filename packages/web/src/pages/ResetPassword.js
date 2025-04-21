@@ -89,8 +89,8 @@ const ResetPassword = () => {
     try {
       // Call the backend endpoint with the token and new password
       const response = await api.put(`/auth/resetpassword/${resetToken}`, { password });
-      setSuccess('Password reset successfully! Redirecting to login...');
-      // Redirect to login page after a delay
+      setSuccess('Password reset successfully! Navigate to login...');
+      // Navigate to login page after a delay
       setTimeout(() => {
         history.push('/login');
       }, 3000);
