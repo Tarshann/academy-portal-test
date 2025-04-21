@@ -1,0 +1,12 @@
+import React from 'react';
+import DashboardLayout from '../../components/layout/DashboardLayout';
+
+const ParentDashboard = () => {
+  return (
+    <DashboardLayout title="Parent Dashboard">
+      <p>Check your childs schedule, messages, and upcoming events.</p>
+    </DashboardLayout>
+  );
+};
+
+export default ParentDashboard;
