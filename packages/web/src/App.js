@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Route,
-  Switch,
+  Routes,
   Redirect,
 } from 'react-router-dom';
 import Login from './pages/Login';
