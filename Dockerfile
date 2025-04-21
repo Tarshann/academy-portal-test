@@ -1,5 +1,5 @@
 # Base image
-FROM node:20-alpine AS base
+FROM node:16-alpine AS base
 LABEL maintainer="Tarshann"
 LABEL description="Academy Portal Application"
 
@@ -31,7 +31,7 @@ COPY . .
 RUN cd packages/web && npm run build
 
 # Production Stage
-FROM node:20-alpine AS production
+FROM node:16-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
 
