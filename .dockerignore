@@ -3,6 +3,12 @@ node_modules
 npm-debug.log
 yarn-debug.log
 yarn-error.log
+packages/*/node_modules
+packages/common/node_modules
+packages/components/node_modules
+packages/server/node_modules
+packages/web/node_modules
+packages/mobile/node_modules
 
 # Version control
 .git
