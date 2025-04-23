@@ -68,7 +68,7 @@ const Login = () => {
 
     setLoading(false);
     if (result.success) {
-      navigate('/login');
+      navigate('/');
     } else {
       setError(result.message || 'Login failed. Please try again.');
     }

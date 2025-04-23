@@ -13,6 +13,7 @@ import Home from './pages/Home';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CssBaseline, Box, CircularProgress, Typography } from '@mui/material';
 import websocket from './shared/websocket';
+import './index.css'; // or 'tailwindcss/tailwind.css'
 
 // // Simple Authentication check (replace with real auth context later)
 // const useAuth = () => {
