@@ -49,7 +49,8 @@ RUN npm install -g pnpm@10.9.0 \
 USER nodejs
 
 EXPOSE 8080
-CMD ["node", "packages/server/server.js"]
+RUN ls -la /app/packages/server
+CMD ["node", "packages/server/server-entry.js"]
 
 # Optional Healthcheck
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
