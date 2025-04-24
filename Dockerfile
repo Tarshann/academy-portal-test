@@ -49,8 +49,6 @@ RUN npm install -g pnpm@10.9.0 \
 # ✅ Re-add user creation step here
 RUN addgroup -g 1001 nodejs && adduser -S -u 1001 -G nodejs nodejs
 
-USER nodejs
-
 EXPOSE 8080
 RUN ls -la /app/packages/server
 CMD ["node", "packages/server/server-entry.js"]
