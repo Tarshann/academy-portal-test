@@ -46,6 +46,9 @@ COPY --from=builder /app/packages/web/build /app/packages/web/build
 RUN npm install -g pnpm@10.9.0 \
   && pnpm install --prod
   
+# ✅ Re-add user creation step here
+RUN addgroup -g 1001 nodejs && adduser -S -u 1001 -G nodejs nodejs
+
 USER nodejs
 
 EXPOSE 8080
