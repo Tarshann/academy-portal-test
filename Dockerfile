@@ -39,6 +39,7 @@ ENV NODE_ENV=production
 
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/packages/common /app/packages/common
+COPY --from=builder /app/packages/components /app/packages/components
 COPY --from=builder /app/packages/server /app/packages/server
 COPY --from=builder /app/packages/web/build /app/packages/web/build
 
