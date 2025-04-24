@@ -48,7 +48,6 @@ RUN npm install -g pnpm@10.9.0 \
 USER nodejs
 
 EXPOSE 8080
-RUN ls -R /app/packages/server
 CMD ["node", "packages/server/server.js"]
 
 # Optional Healthcheck
