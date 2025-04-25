@@ -51,7 +51,9 @@ RUN addgroup -g 1001 nodejs && adduser -S -u 1001 -G nodejs nodejs
 
 EXPOSE 8080
 RUN ls -la /app/packages/server
-CMD ["node", "packages/server/server-entry.js"]
+WORKDIR /app/packages/server
+CMD ["node", "server.js"]
+
 
 # Optional Healthcheck
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
