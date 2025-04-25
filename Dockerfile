@@ -52,7 +52,7 @@ RUN addgroup -g 1001 nodejs && adduser -S -u 1001 -G nodejs nodejs
 EXPOSE 8080
 RUN ls -la /app/packages/server
 WORKDIR /app/packages/server
-CMD ["node", "server.js"]
+CMD ["node", "index.js"]
 
 
 # Optional Healthcheck
